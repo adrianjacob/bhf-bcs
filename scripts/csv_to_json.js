@@ -25,7 +25,6 @@ const fields = {
   "Translational Awards": ["Helena T"],
   "Programme Grants": ["Subreena S"],
   "Special Programmes": ["Zoe H"],
-  "Filming": ["Ollie H"],
   "Discovery Research": ["Abby W"],
   "Clinical Research": ["Kieran P"]
 };
@@ -58,10 +57,10 @@ const representatives = {
       "Monday 1st": [
         { "startTime": "15:45", "endTime": "16:15", "type": "drop-in", "label": "Drop-in" }
       ],
-      "Tuesday 2nd": [
+      "Tuesday 2nd": [],
+      "Wednesday 3rd": [
         { "startTime": "16:00", "endTime": "17:00", "type": "bookable", "label": "Bookable slots" }
-      ],
-      "Wednesday 3rd": []
+      ]
     }
   },
   "Barbara V": {
@@ -184,23 +183,6 @@ const representatives = {
       ],
       "Tuesday 2nd": [
         { "startTime": "10:45", "endTime": "11:15", "type": "drop-in", "label": "Drop-in" }
-      ],
-      "Wednesday 3rd": []
-    }
-  },
-  "Ollie H": {
-    "name": "Ollie H",
-    "role": "Filming",
-    "schedule": {
-      "Monday 1st": [
-        { "startTime": "14:00", "endTime": "14:15", "type": "bookable", "label": "Chris" },
-        { "startTime": "14:30", "endTime": "14:45", "type": "bookable", "label": "Kathryn" }
-      ],
-      "Tuesday 2nd": [
-        { "startTime": "09:30", "endTime": "09:45", "type": "bookable", "label": "Marc?" },
-        { "startTime": "10:00", "endTime": "10:15", "type": "bookable", "label": "Marc?" },
-        { "startTime": "11:00", "endTime": "11:15", "type": "bookable", "label": "Marc?" },
-        { "startTime": "15:15", "endTime": "15:30", "type": "bookable", "label": "Paz?" }
       ],
       "Wednesday 3rd": []
     }
