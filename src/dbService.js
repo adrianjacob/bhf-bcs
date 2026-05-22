@@ -3,6 +3,7 @@
 
 const LOCAL_STORAGE_KEY = 'bhf_bcs_bookings';
 const AVAILABILITY_URL = '/data/availability.json';
+const SLOT_DURATION_MINUTES = 10;
 
 export class DbService {
   constructor() {
@@ -61,16 +62,13 @@ export class DbService {
         const mergedBlocks = [];
 
         for (const block of blocks) {
-          // For now, treat all scheduled blocks as bookable 15-minute slots.
-          const isBookableBlock = ['bookable', 'drop-in', 'booked', 'unavailable'].includes(block.type);
-
-          if (isBookableBlock) {
+          if (block.type === 'bookable' || block.type === 'booked') {
             const start = this.timeToMinutes(block.startTime);
             const end = this.timeToMinutes(block.endTime);
 
-            for (let t = start; t < end; t += 15) {
+            for (let t = start; t + SLOT_DURATION_MINUTES <= end; t += SLOT_DURATION_MINUTES) {
               const slotStart = this.minutesToTime(t);
-              const slotEnd = this.minutesToTime(t + 15);
+              const slotEnd = this.minutesToTime(t + SLOT_DURATION_MINUTES);
               const slotTime = `${slotStart}-${slotEnd}`;
               const bookingKey = `${repName}_${day}_${slotTime}`;
 
@@ -92,6 +90,8 @@ export class DbService {
                 });
               }
             }
+          } else if (block.type === 'drop-in') {
+            mergedBlocks.push(...this.splitTimeBlockIntoSlots(block, 'drop-in'));
           } else {
             mergedBlocks.push(block);
           }
@@ -177,15 +177,15 @@ export class DbService {
     return { repName, day, startTime, endTime };
   }
 
-  splitIntoFifteenMinuteSlots(block, type) {
+  splitTimeBlockIntoSlots(block, type) {
     const slots = [];
     const start = this.timeToMinutes(block.startTime);
     const end = this.timeToMinutes(block.endTime);
 
-    for (let t = start; t < end; t += 15) {
+    for (let t = start; t + SLOT_DURATION_MINUTES <= end; t += SLOT_DURATION_MINUTES) {
       slots.push({
         startTime: this.minutesToTime(t),
-        endTime: this.minutesToTime(t + 15),
+        endTime: this.minutesToTime(t + SLOT_DURATION_MINUTES),
         type,
         label: block.label || (type === 'drop-in' ? 'Drop-in' : 'Bookable')
       });

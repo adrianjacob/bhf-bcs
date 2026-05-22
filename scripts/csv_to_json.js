@@ -47,7 +47,7 @@ const representatives = {
         { "startTime": "14:15", "endTime": "15:00", "type": "drop-in", "label": "Drop-in" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "14:00", "endTime": "14:30", "type": "booked", "label": "Booked slots" }
+        { "startTime": "14:00", "endTime": "14:30", "type": "bookable", "label": "Booked slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -61,7 +61,7 @@ const representatives = {
       ],
       "Tuesday 2nd": [],
       "Wednesday 3rd": [
-        { "startTime": "16:00", "endTime": "16:45", "type": "booked", "label": "Booked slots" }
+        { "startTime": "16:00", "endTime": "16:45", "type": "bookable", "label": "Booked slots" }
       ]
     }
   },
@@ -71,7 +71,7 @@ const representatives = {
     "schedule": {
       "Monday 1st": [],
       "Tuesday 2nd": [
-        { "startTime": "09:30", "endTime": "10:00", "type": "booked", "label": "Booked slots" }
+        { "startTime": "09:30", "endTime": "10:00", "type": "bookable", "label": "Booked slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -84,7 +84,7 @@ const representatives = {
         { "startTime": "15:15", "endTime": "16:00", "type": "drop-in", "label": "Drop-in" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "10:15", "endTime": "11:00", "type": "booked", "label": "Booked slots" }
+        { "startTime": "10:15", "endTime": "11:00", "type": "bookable", "label": "Booked slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -94,7 +94,7 @@ const representatives = {
     "role": "CSC",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "14:00", "endTime": "14:45", "type": "booked", "label": "Booked slots" }
+        { "startTime": "14:00", "endTime": "14:45", "type": "bookable", "label": "Booked slots" }
       ],
       "Tuesday 2nd": [],
       "Wednesday 3rd": [
@@ -146,7 +146,7 @@ const representatives = {
         { "startTime": "14:45", "endTime": "15:45", "type": "drop-in", "label": "Drop-in" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "10:45", "endTime": "11:30", "type": "booked", "label": "Booked slots" }
+        { "startTime": "10:45", "endTime": "11:30", "type": "bookable", "label": "Booked slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -160,7 +160,7 @@ const representatives = {
       ],
       "Tuesday 2nd": [],
       "Wednesday 3rd": [
-        { "startTime": "09:45", "endTime": "10:45", "type": "booked", "label": "Booked slots" }
+        { "startTime": "09:45", "endTime": "10:45", "type": "bookable", "label": "Booked slots" }
       ]
     }
   },
@@ -170,7 +170,7 @@ const representatives = {
     "schedule": {
       "Monday 1st": [],
       "Tuesday 2nd": [
-        { "startTime": "09:15", "endTime": "10:00", "type": "booked", "label": "Booked slots" },
+        { "startTime": "09:15", "endTime": "10:00", "type": "bookable", "label": "Booked slots" },
         { "startTime": "10:00", "endTime": "10:30", "type": "drop-in", "label": "Drop-in" }
       ],
       "Wednesday 3rd": []
@@ -181,7 +181,7 @@ const representatives = {
     "role": "Special Programmes",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "14:45", "endTime": "15:45", "type": "booked", "label": "Booked slots" }
+        { "startTime": "14:45", "endTime": "15:45", "type": "bookable", "label": "Booked slots" }
       ],
       "Tuesday 2nd": [
         { "startTime": "10:00", "endTime": "10:30", "type": "drop-in", "label": "Drop-in" }
@@ -194,14 +194,14 @@ const representatives = {
     "role": "Filming",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "14:00", "endTime": "14:15", "type": "booked", "label": "Chris" },
-        { "startTime": "14:30", "endTime": "14:45", "type": "booked", "label": "Kathryn" }
+        { "startTime": "14:00", "endTime": "14:15", "type": "bookable", "label": "Chris" },
+        { "startTime": "14:30", "endTime": "14:45", "type": "bookable", "label": "Kathryn" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "09:30", "endTime": "09:45", "type": "booked", "label": "Marc?" },
-        { "startTime": "10:00", "endTime": "10:15", "type": "booked", "label": "Marc?" },
-        { "startTime": "11:00", "endTime": "11:15", "type": "booked", "label": "Marc?" },
-        { "startTime": "15:15", "endTime": "15:30", "type": "booked", "label": "Paz?" }
+        { "startTime": "09:30", "endTime": "09:45", "type": "bookable", "label": "Marc?" },
+        { "startTime": "10:00", "endTime": "10:15", "type": "bookable", "label": "Marc?" },
+        { "startTime": "11:00", "endTime": "11:15", "type": "bookable", "label": "Marc?" },
+        { "startTime": "15:15", "endTime": "15:30", "type": "bookable", "label": "Paz?" }
       ],
       "Wednesday 3rd": []
     }

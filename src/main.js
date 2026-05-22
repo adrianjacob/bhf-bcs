@@ -327,7 +327,7 @@ function renderMyBookings() {
     myBookingsCard.innerHTML = `
       <div class="empty-state">
         <h3>No bookings yet</h3>
-        <p>Browse the fields list to book a 15-minute session.</p>
+        <p>Browse the fields list to book a 10-minute session.</p>
       </div>
     `;
     return;
