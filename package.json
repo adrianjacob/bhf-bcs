@@ -1,0 +1,15 @@
+{
+  "name": "bhf-booking-app",
+  "version": "1.0.0",
+  "description": "Booking app for BHF representatives at BCS sessions",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

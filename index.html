@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BHF Representative Bookings - BCS Sessions</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="bhf-logo" aria-hidden="true"></div>
+        <div class="logo-text">
+          <h1>British Heart Foundation</h1>
+          <p>BCS Stand Sessions Booking</p>
+        </div>
+      </div>
+      <div class="booking-stats">
+        My Bookings: <span id="booking-count">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro-section">
+      <div class="intro-header">
+        <h2>Representative Availability</h2>
+        <div class="view-toggles">
+          <button id="btn-card-view" class="view-btn active" aria-pressed="true">Card View</button>
+          <button id="btn-grid-view" class="view-btn" aria-pressed="false">Spreadsheet Grid View</button>
+        </div>
+      </div>
+      <p>
+        Select your field of interest below to view scheduled sessions at the BHF stand during the BCS conference. 
+        You can drop in during designated <strong>Drop-in</strong> times (no booking required) or schedule a 15-minute meeting during <strong>Bookable</strong> windows.
+      </p>
+    </section>
+
+    <!-- Field/Area Selector -->
+    <section class="filter-section">
+      <p class="field-label">Select Field / Area of Interest</p>
+      
+      <!-- Desktop Selector (Tabs) -->
+      <div class="field-tabs" id="field-tabs-container" role="tablist">
+        <!-- Rendered dynamically -->
+      </div>
+      
+      <!-- Mobile Selector (Dropdown) -->
+      <div class="field-select-container">
+        <select class="field-select" id="field-select" aria-label="Select Field of Interest">
+          <!-- Rendered dynamically -->
+        </select>
+      </div>
+    </section>
+
+    <!-- 1. Card View Container -->
+    <div id="card-view-container" class="view-container active">
+      <div class="card-grid" id="card-grid">
+        <!-- Cards rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- 2. Grid View Container -->
+    <div id="grid-view-container" class="view-container">
+      <div class="grid-card">
+        <div class="grid-controls">
+          <!-- Day Selector for Table -->
+          <div class="grid-day-select" id="grid-day-selector">
+            <button class="grid-day-btn active" data-day="Monday 1st">Monday 1st</button>
+            <button class="grid-day-btn" data-day="Tuesday 2nd">Tuesday 2nd</button>
+            <button class="grid-day-btn" data-day="Wednesday 3rd">Wednesday 3rd</button>
+          </div>
+          
+          <!-- Color Legend -->
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color bookable" aria-hidden="true"></span>
+              <span>Bookable Slot</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color drop-in" aria-hidden="true"></span>
+              <span>Drop-in</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color user-booked" aria-hidden="true"></span>
+              <span>Booked by You</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color booked" aria-hidden="true"></span>
+              <span>Booked</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color unavailable" aria-hidden="true"></span>
+              <span>Unavailable</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spreadsheet Table -->
+        <div class="table-responsive">
+          <table class="spreadsheet-table" id="spreadsheet-table">
+            <thead>
+              <!-- Headers rendered dynamically -->
+            </thead>
+            <tbody>
+              <!-- Rows rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Booking Dialog Modal -->
+  <dialog id="booking-dialog">
+    <div class="modal-header">
+      <h3>Request 15-Minute Booking</h3>
+      <button class="btn-close-modal" id="btn-close-modal" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="booking-summary">
+        <div class="summary-row">
+          <span class="summary-label">Representative:</span>
+          <span class="summary-val" id="summary-rep">Laura M</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Committee:</span>
+          <span class="summary-val" id="summary-committee">Discovery Fellowships</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Day:</span>
+          <span class="summary-val" id="summary-day">Monday 1st</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Time Slot:</span>
+          <span class="summary-val" id="summary-time">14:15 - 14:30</span>
+        </div>
+      </div>
+
+      <form id="booking-form" method="dialog">
+        <div class="form-group">
+          <label for="booking-name">Full Name *</label>
+          <input type="text" id="booking-name" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label for="booking-email">Email Address *</label>
+          <input type="email" id="booking-email" required placeholder="Enter your email address">
+        </div>
+        <div class="form-group">
+          <label for="booking-interest">Project / Inquiry Interest *</label>
+          <textarea id="booking-interest" rows="3" required placeholder="Briefly describe what you'd like to discuss (e.g. Clinical Fellowships, specific project inquiry)"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel-form" id="btn-cancel-form">Cancel</button>
+          <button type="submit" class="btn-submit-form">Confirm Booking</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
