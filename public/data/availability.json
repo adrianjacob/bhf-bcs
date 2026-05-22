@@ -34,10 +34,6 @@
     ],
     "Clinical Research": [
       "Kieran P"
-    ],
-    "Other": [
-      "Abby W",
-      "Kieran P"
     ]
   },
   "representatives": {
@@ -237,8 +233,7 @@
     "Abby W": {
       "name": "Abby W",
       "committee": [
-        "Discovery Research",
-        "Other"
+        "Discovery Research"
       ],
       "role": "HoDRP",
       "schedule": {
@@ -264,8 +259,7 @@
     "Kieran P": {
       "name": "Kieran P",
       "committee": [
-        "Clinical Research",
-        "Other"
+        "Clinical Research"
       ],
       "role": "HoCRP",
       "schedule": {

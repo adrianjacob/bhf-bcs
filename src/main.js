@@ -98,11 +98,7 @@ function fieldHasDropIn(field) {
 
 function sortFieldNames(fields) {
   const names = Array.isArray(fields) ? fields : Object.keys(fields);
-  const sorted = names.filter((name) => name !== 'Other').sort((a, b) => a.localeCompare(b));
-  if (names.includes('Other')) {
-    sorted.push('Other');
-  }
-  return sorted;
+  return names.sort((a, b) => a.localeCompare(b));
 }
 
 function renderFieldList(fields) {

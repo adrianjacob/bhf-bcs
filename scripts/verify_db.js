@@ -44,10 +44,10 @@ async function testDbService() {
   const reps = dbService.getRepresentatives();
   console.log('Reps loaded:', Object.keys(reps));
   
-  if (!fields['Other'] || fields['Other'].length !== 2) {
-    throw new Error('Other field mapping is incorrect');
+  if (!fields['Discovery Research'] || fields['Discovery Research'].length !== 1) {
+    throw new Error('Discovery Research field mapping is incorrect');
   }
-  console.log('✓ "Other" field contains:', fields['Other']);
+  console.log('✓ "Discovery Research" field contains:', fields['Discovery Research']);
   
   // 2. Fetch Availability (empty bookings)
   let state = await dbService.getAvailability();

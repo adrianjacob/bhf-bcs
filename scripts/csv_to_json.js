@@ -27,8 +27,7 @@ const fields = {
   "Special Programmes": ["Zoe H"],
   "Filming": ["Ollie H"],
   "Discovery Research": ["Abby W"],
-  "Clinical Research": ["Kieran P"],
-  "Other": ["Abby W", "Kieran P"]
+  "Clinical Research": ["Kieran P"]
 };
 
 function committeesForRep(repName) {
