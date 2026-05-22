@@ -19,8 +19,8 @@ global.localStorage = localStorageMock;
 
 // Mock fetch to load the local availability.json file
 global.fetch = async (url) => {
-  if (url === '/src/data/availability.json') {
-    const jsonPath = path.join(__dirname, '../src/data/availability.json');
+  if (url === '/data/availability.json') {
+    const jsonPath = path.join(__dirname, '../public/data/availability.json');
     const data = fs.readFileSync(jsonPath, 'utf8');
     return {
       ok: true,

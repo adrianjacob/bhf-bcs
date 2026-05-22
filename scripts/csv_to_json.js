@@ -7,8 +7,12 @@ const __dirname = path.dirname(__filename);
 
 // Ensure directories exist
 const dataDir = path.join(__dirname, '../src/data');
+const publicDataDir = path.join(__dirname, '../public/data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(publicDataDir)) {
+  fs.mkdirSync(publicDataDir, { recursive: true });
 }
 
 // Define the fields and representatives
@@ -240,10 +244,9 @@ const database = {
   externalBookings
 };
 
-fs.writeFileSync(
-  path.join(dataDir, 'availability.json'),
-  JSON.stringify(database, null, 2),
-  'utf8'
-);
+const databaseJson = JSON.stringify(database, null, 2);
 
-console.log('Successfully generated src/data/availability.json!');
+fs.writeFileSync(path.join(dataDir, 'availability.json'), databaseJson, 'utf8');
+fs.writeFileSync(path.join(publicDataDir, 'availability.json'), databaseJson, 'utf8');
+
+console.log('Successfully generated src/data/availability.json and public/data/availability.json!');

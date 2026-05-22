@@ -2,6 +2,7 @@
 // This is designed to act as a clean data layer that can be easily swapped for Firebase.
 
 const LOCAL_STORAGE_KEY = 'bhf_bcs_bookings';
+const AVAILABILITY_URL = '/data/availability.json';
 
 export class DbService {
   constructor() {
@@ -11,7 +12,7 @@ export class DbService {
   // Load the initial mock database
   async init() {
     try {
-      const response = await fetch('/src/data/availability.json');
+      const response = await fetch(AVAILABILITY_URL);
       if (!response.ok) {
         throw new Error('Failed to load availability data');
       }
