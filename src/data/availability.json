@@ -43,7 +43,7 @@
   "representatives": {
     "Laura M": {
       "name": "Laura M",
-      "committee": "Discovery Fellowships (Laura M)",
+      "committee": ["Discovery Fellowships"],
       "role": "Fellows (Disc)",
       "schedule": {
         "Monday 1st": [
@@ -67,7 +67,7 @@
     },
     "Sarah K": {
       "name": "Sarah K",
-      "committee": "Clinical Fellowships (Sarah K)",
+      "committee": ["Clinical Fellowships"],
       "role": "Fellows (Clin)",
       "schedule": {
         "Monday 1st": [
@@ -91,7 +91,7 @@
     },
     "Barbara V": {
       "name": "Barbara V",
-      "committee": "Clinical Fellowships (Barbara V)",
+      "committee": ["Clinical Fellowships"],
       "role": "Fellows (Clin)",
       "schedule": {
         "Monday 1st": [],
@@ -108,7 +108,7 @@
     },
     "Aimee E": {
       "name": "Aimee E",
-      "committee": "Project Grants (Aimee E)",
+      "committee": ["Project Grants"],
       "role": "Projects",
       "schedule": {
         "Monday 1st": [
@@ -123,8 +123,8 @@
           {
             "startTime": "10:15",
             "endTime": "11:00",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
@@ -132,15 +132,15 @@
     },
     "Phoebe K": {
       "name": "Phoebe K",
-      "committee": "Clinical Studies (Phoebe K)",
+      "committee": ["Clinical Studies"],
       "role": "CSC",
       "schedule": {
         "Monday 1st": [
           {
             "startTime": "14:00",
             "endTime": "14:45",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           }
         ],
         "Tuesday 2nd": [],
@@ -156,7 +156,7 @@
     },
     "Shannon A": {
       "name": "Shannon A",
-      "committee": "Clinical Studies (Shannon A)",
+      "committee": ["Clinical Studies"],
       "role": "CSC",
       "schedule": {
         "Monday 1st": [],
@@ -173,7 +173,7 @@
     },
     "Andrew L": {
       "name": "Andrew L",
-      "committee": "Healthcare Implementation Awards (Andrew L)",
+      "committee": ["Healthcare Implementation Awards"],
       "role": "HIF",
       "schedule": {
         "Monday 1st": [
@@ -196,7 +196,7 @@
     },
     "Helena T": {
       "name": "Helena T",
-      "committee": "Translational Awards (Helena T)",
+      "committee": ["Translational Awards"],
       "role": "TAC",
       "schedule": {
         "Monday 1st": [
@@ -220,7 +220,7 @@
     },
     "Abby W": {
       "name": "Abby W",
-      "committee": "Discovery research & Other (Abby W)",
+      "committee": ["Discovery Research", "Other"],
       "role": "HoDRP",
       "schedule": {
         "Monday 1st": [
@@ -235,8 +235,8 @@
           {
             "startTime": "10:45",
             "endTime": "11:30",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
@@ -244,7 +244,7 @@
     },
     "Kieran P": {
       "name": "Kieran P",
-      "committee": "Clinical research & Other (Kieran P)",
+      "committee": ["Clinical Research", "Other"],
       "role": "HoCRP",
       "schedule": {
         "Monday 1st": [
@@ -260,15 +260,15 @@
           {
             "startTime": "09:45",
             "endTime": "10:45",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           }
         ]
       }
     },
     "Subreena S": {
       "name": "Subreena S",
-      "committee": "Programme Grants (Subreena S)",
+      "committee": ["Programme Grants"],
       "role": "CPGC",
       "schedule": {
         "Monday 1st": [],
@@ -276,8 +276,8 @@
           {
             "startTime": "09:15",
             "endTime": "10:00",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           },
           {
             "startTime": "10:00",
@@ -291,15 +291,15 @@
     },
     "Zoe H": {
       "name": "Zoe H",
-      "committee": "Special Programmes (Zoe H)",
+      "committee": ["Special Programmes"],
       "role": "Special Programmes",
       "schedule": {
         "Monday 1st": [
           {
             "startTime": "14:45",
             "endTime": "15:45",
-            "type": "booked",
-            "label": "Booked slots"
+            "type": "bookable",
+            "label": "Bookable slots"
           }
         ],
         "Tuesday 2nd": [
@@ -315,7 +315,7 @@
     },
     "Ollie H": {
       "name": "Ollie H",
-      "committee": "Filming",
+      "committee": ["Filming"],
       "role": "Filming",
       "schedule": {
         "Monday 1st": [

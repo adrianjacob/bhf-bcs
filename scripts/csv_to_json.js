@@ -27,11 +27,16 @@ const fields = {
   "Other": ["Abby W", "Kieran P"]
 };
 
+function committeesForRep(repName) {
+  return Object.entries(fields)
+    .filter(([, reps]) => reps.includes(repName))
+    .map(([fieldName]) => fieldName);
+}
+
 // Reconstruct the exact database from the Google Sheet screenshot and CSV
 const representatives = {
   "Laura M": {
     "name": "Laura M",
-    "committee": "Discovery Fellowships (Laura M)",
     "role": "Fellows (Disc)",
     "schedule": {
       "Monday 1st": [
@@ -45,7 +50,6 @@ const representatives = {
   },
   "Sarah K": {
     "name": "Sarah K",
-    "committee": "Clinical Fellowships (Sarah K)",
     "role": "Fellows (Clin)",
     "schedule": {
       "Monday 1st": [
@@ -59,7 +63,6 @@ const representatives = {
   },
   "Barbara V": {
     "name": "Barbara V",
-    "committee": "Clinical Fellowships (Barbara V)",
     "role": "Fellows (Clin)",
     "schedule": {
       "Monday 1st": [],
@@ -71,7 +74,6 @@ const representatives = {
   },
   "Aimee E": {
     "name": "Aimee E",
-    "committee": "Project Grants (Aimee E)",
     "role": "Projects",
     "schedule": {
       "Monday 1st": [
@@ -85,7 +87,6 @@ const representatives = {
   },
   "Phoebe K": {
     "name": "Phoebe K",
-    "committee": "Clinical Studies (Phoebe K)",
     "role": "CSC",
     "schedule": {
       "Monday 1st": [
@@ -99,7 +100,6 @@ const representatives = {
   },
   "Shannon A": {
     "name": "Shannon A",
-    "committee": "Clinical Studies (Shannon A)",
     "role": "CSC",
     "schedule": {
       "Monday 1st": [],
@@ -111,7 +111,6 @@ const representatives = {
   },
   "Andrew L": {
     "name": "Andrew L",
-    "committee": "Healthcare Implementation Awards (Andrew L)",
     "role": "HIF",
     "schedule": {
       "Monday 1st": [
@@ -124,7 +123,6 @@ const representatives = {
   },
   "Helena T": {
     "name": "Helena T",
-    "committee": "Translational Awards (Helena T)",
     "role": "TAC",
     "schedule": {
       "Monday 1st": [
@@ -138,7 +136,6 @@ const representatives = {
   },
   "Abby W": {
     "name": "Abby W",
-    "committee": "Discovery research & Other (Abby W)",
     "role": "HoDRP",
     "schedule": {
       "Monday 1st": [
@@ -152,7 +149,6 @@ const representatives = {
   },
   "Kieran P": {
     "name": "Kieran P",
-    "committee": "Clinical research & Other (Kieran P)",
     "role": "HoCRP",
     "schedule": {
       "Monday 1st": [
@@ -166,7 +162,6 @@ const representatives = {
   },
   "Subreena S": {
     "name": "Subreena S",
-    "committee": "Programme Grants (Subreena S)",
     "role": "CPGC",
     "schedule": {
       "Monday 1st": [],
@@ -179,7 +174,6 @@ const representatives = {
   },
   "Zoe H": {
     "name": "Zoe H",
-    "committee": "Special Programmes (Zoe H)",
     "role": "Special Programmes",
     "schedule": {
       "Monday 1st": [
@@ -193,7 +187,6 @@ const representatives = {
   },
   "Ollie H": {
     "name": "Ollie H",
-    "committee": "Filming",
     "role": "Filming",
     "schedule": {
       "Monday 1st": [
@@ -236,6 +229,10 @@ const externalBookings = {
     ]
   }
 };
+
+for (const [repName, rep] of Object.entries(representatives)) {
+  rep.committee = committeesForRep(repName);
+}
 
 const database = {
   fields,

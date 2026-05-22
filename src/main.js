@@ -1,29 +1,32 @@
 import { dbService } from './dbService.js';
 
 // Application State
-let activeField = 'Discovery Fellowships';
-let activeDay = 'Monday 1st';
+let activeField = null;
 let currentBookingTarget = null;
+let cancelTarget = null;
 let repsData = null;
 
 // DOM Elements
-const btnCardView = document.getElementById('btn-card-view');
-const btnGridView = document.getElementById('btn-grid-view');
-const cardViewContainer = document.getElementById('card-view-container');
-const gridViewContainer = document.getElementById('grid-view-container');
-
-const fieldTabsContainer = document.getElementById('field-tabs-container');
+const fieldListView = document.getElementById('field-list-view');
+const fieldDetailView = document.getElementById('field-detail-view');
+const myBookingsView = document.getElementById('my-bookings-view');
+const fieldList = document.getElementById('field-list');
+const btnBack = document.getElementById('btn-back');
+const btnBackFromBookings = document.getElementById('btn-back-from-bookings');
+const btnMyBookings = document.getElementById('btn-my-bookings');
 const fieldSelect = document.getElementById('field-select');
-
-const cardGrid = document.getElementById('card-grid');
-
-const gridDaySelector = document.getElementById('grid-day-selector');
-const spreadsheetTable = document.getElementById('spreadsheet-table');
+const scheduleCard = document.getElementById('schedule-card');
+const myBookingsCard = document.getElementById('my-bookings-card');
 
 const bookingDialog = document.getElementById('booking-dialog');
+const cancelDialog = document.getElementById('cancel-dialog');
 const btnCloseModal = document.getElementById('btn-close-modal');
 const btnCancelForm = document.getElementById('btn-cancel-form');
 const bookingForm = document.getElementById('booking-form');
+const btnCloseCancelDialog = document.getElementById('btn-close-cancel-dialog');
+const btnKeepBooking = document.getElementById('btn-keep-booking');
+const btnConfirmCancel = document.getElementById('btn-confirm-cancel');
+const cancelMessage = document.getElementById('cancel-message');
 
 const summaryRep = document.getElementById('summary-rep');
 const summaryCommittee = document.getElementById('summary-committee');
@@ -31,465 +34,451 @@ const summaryDay = document.getElementById('summary-day');
 const summaryTime = document.getElementById('summary-time');
 const bookingNameInput = document.getElementById('booking-name');
 const bookingEmailInput = document.getElementById('booking-email');
-const bookingInterestInput = document.getElementById('booking-interest');
 
 const bookingCountBadge = document.getElementById('booking-count');
 
-// 15-Minute Timeslots array from 09:00 to 17:00
-const timeslots = [];
-function generateTimeslots() {
-  const start = 9 * 60; // 09:00 in minutes
-  const end = 17 * 60;  // 17:00 in minutes
-  for (let t = start; t < end; t += 15) {
-    const slotStart = minutesToTime(t);
-    const slotEnd = minutesToTime(t + 15);
-    timeslots.push({
-      start: slotStart,
-      end: slotEnd,
-      label: `${slotStart}-${slotEnd}`
-    });
-  }
-}
-generateTimeslots();
+const DAYS = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
 
-// Initialize the Application
 async function initApp() {
   try {
-    // Load and process data (merged with localStorage)
     const data = await dbService.getAvailability();
     repsData = data;
-    
-    // Default active field to the first available field key
+
     const fields = Object.keys(data.fields);
-    if (fields.length > 0 && !fields.includes(activeField)) {
+    if (fields.length > 0 && activeField && !fields.includes(activeField)) {
       activeField = fields[0];
     }
 
-    renderFilters(data.fields);
+    renderFieldList(data.fields);
+    renderFieldDropdown(data.fields);
     updateBookingStats();
-    renderActiveView();
+    showFieldList();
     setupEventListeners();
   } catch (error) {
     console.error('App initialization failed:', error);
   }
 }
 
-// Render Field Filter Buttons and Dropdown
-function renderFilters(fields) {
-  fieldTabsContainer.innerHTML = '';
+function hideAllViews() {
+  fieldListView.classList.add('hidden');
+  fieldDetailView.classList.add('hidden');
+  myBookingsView.classList.add('hidden');
+}
+
+function countAvailableSlotsForField(field) {
+  const repNames = repsData.fields[field] || [];
+  let count = 0;
+
+  repNames.forEach((name) => {
+    const rep = repsData.representatives[name];
+    if (!rep) return;
+
+    DAYS.forEach((day) => {
+      (rep.schedule[day] || []).forEach((block) => {
+        if (block.type === 'bookable') count += 1;
+      });
+    });
+  });
+
+  return count;
+}
+
+function fieldHasDropIn(field) {
+  const repNames = repsData.fields[field] || [];
+
+  return repNames.some((name) => {
+    const rep = repsData.representatives[name];
+    if (!rep) return false;
+
+    return DAYS.some((day) =>
+      (rep.schedule[day] || []).some((block) => block.type === 'drop-in')
+    );
+  });
+}
+
+function sortFieldNames(fields) {
+  const names = Array.isArray(fields) ? fields : Object.keys(fields);
+  const sorted = names.filter((name) => name !== 'Other').sort((a, b) => a.localeCompare(b));
+  if (names.includes('Other')) {
+    sorted.push('Other');
+  }
+  return sorted;
+}
+
+function renderFieldList(fields) {
+  fieldList.innerHTML = '';
+
+  sortFieldNames(fields).forEach((field) => {
+    const slotCount = countAvailableSlotsForField(field);
+    const hasDropIn = fieldHasDropIn(field);
+    const item = document.createElement('li');
+    item.className = 'field-list-item';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'field-list-btn';
+    btn.innerHTML = `
+      <span class="field-list-name">${field}</span>
+      <span class="field-list-details">
+        <span class="field-list-meta">${slotCount} bookable slot${slotCount !== 1 ? 's' : ''} available</span>
+        ${hasDropIn ? '<span class="field-list-note">Drop-in times available</span>' : ''}
+      </span>
+    `;
+    btn.addEventListener('click', () => showFieldDetail(field));
+    item.appendChild(btn);
+    fieldList.appendChild(item);
+  });
+}
+
+function renderFieldDropdown(fields) {
   fieldSelect.innerHTML = '';
 
-  Object.keys(fields).forEach((field, index) => {
-    // 1. Render Tabs for Desktop
-    const tabBtn = document.createElement('button');
-    tabBtn.className = `field-tab ${field === activeField ? 'active' : ''}`;
-    tabBtn.setAttribute('role', 'tab');
-    tabBtn.setAttribute('aria-selected', field === activeField ? 'true' : 'false');
-    tabBtn.textContent = field;
-    tabBtn.dataset.field = field;
-    tabBtn.addEventListener('click', () => {
-      setActiveField(field);
-    });
-    fieldTabsContainer.appendChild(tabBtn);
-
-    // 2. Render Options for Mobile select
+  sortFieldNames(fields).forEach((field) => {
     const option = document.createElement('option');
     option.value = field;
     option.textContent = field;
-    option.selected = (field === activeField);
     fieldSelect.appendChild(option);
   });
+}
 
-  // Mobile select change listener
-  fieldSelect.addEventListener('change', (e) => {
-    setActiveField(e.target.value);
-  });
+function showFieldList() {
+  hideAllViews();
+  fieldListView.classList.remove('hidden');
+  if (repsData) {
+    renderFieldList(repsData.fields);
+  }
+}
+
+function showFieldDetail(field) {
+  activeField = field;
+  fieldSelect.value = activeField;
+  hideAllViews();
+  fieldDetailView.classList.remove('hidden');
+  renderCardView();
+}
+
+function showMyBookings() {
+  hideAllViews();
+  myBookingsView.classList.remove('hidden');
+  renderMyBookings();
 }
 
 function setActiveField(field) {
   activeField = field;
-  
-  // Sync desktop tabs
-  document.querySelectorAll('.field-tab').forEach(tab => {
-    const isSelected = tab.dataset.field === activeField;
-    tab.className = `field-tab ${isSelected ? 'active' : ''}`;
-    tab.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-  });
-
-  // Sync mobile select
   fieldSelect.value = activeField;
-
-  // Render view
-  renderActiveView();
+  renderCardView();
 }
 
-// Render the active view (Card or Grid)
-function renderActiveView() {
-  if (btnCardView.classList.contains('active')) {
-    renderCardView();
-  } else {
-    renderGridView();
-  }
-}
-
-// Update My Bookings count badge
 function updateBookingStats() {
-  const bookings = dbService.getBookings();
-  const count = Object.keys(bookings).length;
+  const count = Object.keys(dbService.getBookings()).length;
   bookingCountBadge.textContent = count;
+  btnMyBookings.classList.toggle('hidden', count === 0);
 }
 
-// --- CARD VIEW RENDERER ---
-function renderCardView() {
-  cardGrid.innerHTML = '';
-  
-  const repNamesInField = repsData.fields[activeField] || [];
-  if (repNamesInField.length === 0) {
-    cardGrid.innerHTML = '<div class="empty-state"><h3>No Representatives Found</h3><p>There are no representatives assigned to this field.</p></div>';
-    return;
-  }
+async function refreshData() {
+  repsData = await dbService.getAvailability();
+  updateBookingStats();
+}
 
-  repNamesInField.forEach(name => {
+function getRepNamesInField() {
+  return repsData.fields[activeField] || [];
+}
+
+function getSessionsForFieldOnDay(day) {
+  const sessions = [];
+
+  getRepNamesInField().forEach((name) => {
     const rep = repsData.representatives[name];
     if (!rep) return;
 
-    const card = document.createElement('div');
-    card.className = 'rep-card';
-    
-    // Card Header
-    const cardHeader = `
-      <div class="rep-header">
-        <h3 class="rep-name">${rep.name}</h3>
-        <p class="rep-committee">${rep.committee}</p>
-        <p class="rep-role">Role: ${rep.role}</p>
+    (rep.schedule[day] || [])
+      .filter((block) => block.type !== 'unavailable')
+      .forEach((block) => {
+        sessions.push({ rep, block });
+      });
+  });
+
+  sessions.sort((a, b) => {
+    const typeOrder = { bookable: 0, 'user-booked': 1, booked: 2, 'drop-in': 3 };
+    const typeDiff =
+      (typeOrder[a.block.type] ?? 4) - (typeOrder[b.block.type] ?? 4);
+    if (typeDiff !== 0) return typeDiff;
+    return timeToMinutes(a.block.startTime) - timeToMinutes(b.block.startTime);
+  });
+
+  return sessions;
+}
+
+function buildSlotItemContent(rep, day, block) {
+  const timeLabel = `<span class="slot-time"><strong>${block.startTime} - ${block.endTime}</strong></span>`;
+  const repLabel = `<span class="slot-rep-name">${rep.name}</span>`;
+
+  let action = '';
+
+  if (block.type === 'drop-in') {
+    action = '<span class="slot-badge">Drop-in</span>';
+  } else if (block.type === 'booked') {
+    const labelText = block.label === 'Booked slots' ? 'Booked' : block.label;
+    action = `<span class="slot-badge">${labelText}</span>`;
+  } else if (block.type === 'user-booked') {
+    action = `
+      <div class="slot-actions">
+        <span class="slot-badge">Your Booking</span>
+        <span class="btn-cancel">Cancel</span>
       </div>
     `;
-    card.innerHTML = cardHeader;
+  } else if (block.type === 'bookable') {
+    action = '<span class="btn-book">Book slot</span>';
+  }
 
-    const cardBody = document.createElement('div');
-    cardBody.className = 'rep-body';
+  return `
+    <div class="slot-info">
+      ${timeLabel}
+      ${repLabel}
+    </div>
+    <div class="slot-action">${action}</div>
+  `;
+}
 
-    // Daily Schedules
-    const days = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
-    days.forEach(day => {
-      const daySec = document.createElement('div');
-      daySec.className = 'day-schedule';
-      daySec.innerHTML = `<h4 class="day-title">${day}</h4>`;
+function renderCardView() {
+  scheduleCard.innerHTML = '';
 
+  const repNamesInField = getRepNamesInField();
+  if (repNamesInField.length === 0) {
+    scheduleCard.innerHTML = '<div class="empty-state"><h3>No Representatives Found</h3><p>There are no representatives assigned to this field.</p></div>';
+    return;
+  }
+
+  scheduleCard.innerHTML = `<h3 class="schedule-card-title">${activeField}</h3>`;
+
+  let hasAnySessions = false;
+
+  DAYS.forEach((day) => {
+    const sessions = getSessionsForFieldOnDay(day);
+    const daySec = document.createElement('div');
+    daySec.className = 'day-schedule';
+    daySec.innerHTML = `<h4 class="day-title">${day}</h4>`;
+
+    if (sessions.length === 0) {
+      daySec.innerHTML += '<p class="no-sessions">No sessions scheduled</p>';
+    } else {
+      hasAnySessions = true;
       const slotsList = document.createElement('div');
       slotsList.className = 'slots-list';
 
-      const blocks = rep.schedule[day] || [];
-      const activeBlocks = blocks.filter(b => b.type !== 'unavailable');
+      sessions.forEach(({ rep, block }) => {
+        const slotItem = document.createElement('div');
+        slotItem.className = `slot-item ${block.type}`;
+        slotItem.innerHTML = buildSlotItemContent(rep, day, block);
 
-      if (activeBlocks.length === 0) {
-        daySec.innerHTML += '<p class="no-sessions">No sessions scheduled</p>';
-      } else {
-        activeBlocks.forEach(block => {
-          const slotItem = document.createElement('div');
-          slotItem.className = `slot-item ${block.type}`;
-          
-          let content = `<span><strong>${block.startTime} - ${block.endTime}</strong></span>`;
-          
-          if (block.type === 'drop-in') {
-            content += `<span class="slot-badge">Drop-in</span>`;
-          } else if (block.type === 'booked') {
-            const labelText = block.label === 'Booked slots' ? 'Booked' : `Booked (${block.label})`;
-            content += `<span class="slot-badge">${labelText}</span>`;
-          } else if (block.type === 'user-booked') {
-            content += `
-              <div>
-                <span class="slot-badge" style="margin-right: 6px;">Your Booking</span>
-                <button class="btn-cancel" data-rep="${rep.name}" data-day="${day}" data-start="${block.startTime}" data-end="${block.endTime}">Cancel</button>
-              </div>
-            `;
-          } else if (block.type === 'bookable') {
-            content += `
-              <button class="btn-book" data-rep="${rep.name}" data-day="${day}" data-start="${block.startTime}" data-end="${block.endTime}" data-committee="${rep.committee}">Book 15 min</button>
-            `;
-          }
+        if (block.type === 'bookable') {
+          slotItem.dataset.rep = rep.name;
+          slotItem.dataset.day = day;
+          slotItem.dataset.start = block.startTime;
+          slotItem.dataset.end = block.endTime;
+          slotItem.setAttribute('role', 'button');
+          slotItem.setAttribute('tabindex', '0');
+          slotItem.setAttribute('aria-label', `Book slot with ${rep.name}, ${day}, ${block.startTime} to ${block.endTime}`);
+        }
 
-          slotItem.innerHTML = content;
-          slotsList.appendChild(slotItem);
-        });
-        daySec.appendChild(slotsList);
-      }
-      cardBody.appendChild(daySec);
-    });
+        if (block.type === 'user-booked') {
+          slotItem.dataset.rep = rep.name;
+          slotItem.dataset.day = day;
+          slotItem.dataset.start = block.startTime;
+          slotItem.dataset.end = block.endTime;
+          slotItem.setAttribute('role', 'button');
+          slotItem.setAttribute('tabindex', '0');
+          slotItem.setAttribute('aria-label', `Cancel booking with ${rep.name}, ${day}, ${block.startTime} to ${block.endTime}`);
+        }
 
-    card.appendChild(cardBody);
-    cardGrid.appendChild(card);
+        slotsList.appendChild(slotItem);
+      });
+
+      daySec.appendChild(slotsList);
+    }
+
+    scheduleCard.appendChild(daySec);
   });
 
-  // Attach card event listeners
+  if (!hasAnySessions) {
+    scheduleCard.innerHTML += '<p class="no-sessions no-sessions--card">No sessions scheduled for this field.</p>';
+  }
+
   attachSlotEventListeners();
 }
 
-// --- GRID VIEW RENDERER ---
-function renderGridView() {
-  const tableHead = spreadsheetTable.querySelector('thead');
-  const tableBody = spreadsheetTable.querySelector('tbody');
-  
-  tableHead.innerHTML = '';
-  tableBody.innerHTML = '';
+function buildItineraryItemContent(booking) {
+  return `
+    <div class="slot-info">
+      <span class="slot-time"><strong>${booking.startTime} - ${booking.endTime}</strong></span>
+      <span class="slot-rep-name">${booking.repName}</span>
+      <span class="slot-field">${booking.field}</span>
+    </div>
+    <div class="slot-action">
+      <span class="btn-cancel">Cancel</span>
+    </div>
+  `;
+}
 
-  const repNamesInField = repsData.fields[activeField] || [];
-  if (repNamesInField.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="33" class="empty-state"><h3>No Data</h3><p>No representatives for this field.</p></td></tr>';
+function renderMyBookings() {
+  const itinerary = dbService.getBookingsItinerary();
+
+  if (itinerary.length === 0) {
+    myBookingsCard.innerHTML = `
+      <div class="empty-state">
+        <h3>No bookings yet</h3>
+        <p>Browse the fields list to book a 15-minute session.</p>
+      </div>
+    `;
     return;
   }
 
-  // 1. Render Header Row (Timeslots)
-  const headerRow = document.createElement('tr');
-  
-  const repHeader = document.createElement('th');
-  repHeader.className = 'sticky-col';
-  repHeader.textContent = 'Representative';
-  headerRow.appendChild(repHeader);
+  myBookingsCard.innerHTML = '';
 
-  timeslots.forEach(slot => {
-    const timeTh = document.createElement('th');
-    timeTh.textContent = slot.label;
-    headerRow.appendChild(timeTh);
+  const grouped = {};
+  itinerary.forEach((booking) => {
+    if (!grouped[booking.day]) grouped[booking.day] = [];
+    grouped[booking.day].push(booking);
   });
-  tableHead.appendChild(headerRow);
 
-  // 2. Render Rows per Representative
-  repNamesInField.forEach(name => {
-    const rep = repsData.representatives[name];
-    if (!rep) return;
+  DAYS.filter((day) => grouped[day]).forEach((day) => {
+    const daySec = document.createElement('div');
+    daySec.className = 'day-schedule';
+    daySec.innerHTML = `<h4 class="day-title">${day}</h4>`;
 
-    const row = document.createElement('tr');
-    
-    // Sticky representative identity column
-    const repCell = document.createElement('td');
-    repCell.className = 'sticky-col';
-    repCell.innerHTML = `
-      <div class="rep-cell-info">
-        <span class="rep-cell-name">${rep.name}</span>
-        <span class="rep-cell-comm">${rep.role}</span>
-      </div>
-    `;
-    row.appendChild(repCell);
+    const slotsList = document.createElement('div');
+    slotsList.className = 'slots-list';
 
-    // Render cells for each timeslot
-    timeslots.forEach((slot, index) => {
-      const cell = document.createElement('td');
-      cell.className = 'grid-cell';
-
-      const block = getBlockForTime(rep, activeDay, slot.start, slot.end);
-      
-      if (block) {
-        cell.classList.add(`cell-${block.type}`);
-        
-        // Custom Tooltip details
-        let tooltipContent = `<strong>Time:</strong> ${block.startTime}-${block.endTime}<br><strong>Status:</strong> `;
-        
-        // Remove borders to display block continuity (merged cells aesthetic)
-        const isStart = (block.startTime === slot.start);
-        const hasPrev = (index > 0 && getBlockForTime(rep, activeDay, timeslots[index - 1].start, timeslots[index - 1].end) === block);
-        const hasNext = (index < timeslots.length - 1 && getBlockForTime(rep, activeDay, timeslots[index + 1].start, timeslots[index + 1].end) === block);
-
-        if (hasPrev) cell.style.borderLeft = 'none';
-        if (hasNext) cell.style.borderRight = 'none';
-
-        // Render block label at the beginning cell of the block
-        if (isStart) {
-          if (block.type === 'drop-in') {
-            cell.textContent = 'Drop-in';
-          } else if (block.type === 'booked') {
-            cell.textContent = block.label === 'Booked slots' ? 'Booked' : block.label;
-          } else if (block.type === 'user-booked') {
-            cell.textContent = 'Yours';
-          } else if (block.type === 'bookable') {
-            cell.textContent = 'Bookable';
-          } else if (block.type === 'unavailable') {
-            cell.textContent = 'Blocked';
-          }
-        }
-
-        // Add visual indicator / actions
-        if (block.type === 'bookable') {
-          tooltipContent += `Available (Click to book)`;
-          cell.dataset.action = 'book';
-          cell.dataset.rep = rep.name;
-          cell.dataset.day = activeDay;
-          cell.dataset.start = slot.start;
-          cell.dataset.end = slot.end;
-          cell.dataset.committee = rep.committee;
-        } else if (block.type === 'user-booked') {
-          tooltipContent += `Booked by You (Click to cancel)`;
-          cell.dataset.action = 'cancel';
-          cell.dataset.rep = rep.name;
-          cell.dataset.day = activeDay;
-          cell.dataset.start = slot.start;
-          cell.dataset.end = slot.end;
-        } else if (block.type === 'drop-in') {
-          tooltipContent += `Drop-in Session (No booking needed)`;
-        } else if (block.type === 'booked') {
-          const nameSuffix = block.label === 'Booked slots' ? '' : ` (${block.label})`;
-          tooltipContent += `Already Booked${nameSuffix}`;
-        } else if (block.type === 'unavailable') {
-          tooltipContent += `Busy / Unavailable`;
-        }
-
-        cell.innerHTML += `<div class="cell-tooltip">${tooltipContent}</div>`;
-      }
-      
-      row.appendChild(cell);
+    grouped[day].forEach((booking) => {
+      const slotItem = document.createElement('div');
+      slotItem.className = 'slot-item user-booked itinerary-item';
+      slotItem.innerHTML = buildItineraryItemContent(booking);
+      slotItem.dataset.rep = booking.repName;
+      slotItem.dataset.day = booking.day;
+      slotItem.dataset.start = booking.startTime;
+      slotItem.dataset.end = booking.endTime;
+      slotItem.setAttribute('role', 'button');
+      slotItem.setAttribute('tabindex', '0');
+      slotItem.setAttribute(
+        'aria-label',
+        `Cancel booking with ${booking.repName} on ${booking.day} at ${booking.startTime} to ${booking.endTime}`
+      );
+      slotsList.appendChild(slotItem);
     });
 
-    tableBody.appendChild(row);
+    daySec.appendChild(slotsList);
+    myBookingsCard.appendChild(daySec);
   });
 
-  // Attach spreadsheet interactive event listeners
-  attachGridEventListeners();
+  attachCancelListeners(myBookingsCard);
 }
 
-// Helper: Check if slot overlaps with representative schedule block
-function getBlockForTime(rep, day, startTimeStr, endTimeStr) {
-  if (!rep.schedule || !rep.schedule[day]) return null;
-  
-  const slotStart = timeToMinutes(startTimeStr);
-  const slotEnd = timeToMinutes(endTimeStr);
-  
-  for (const block of rep.schedule[day]) {
-    const blockStart = timeToMinutes(block.startTime);
-    const blockEnd = timeToMinutes(block.endTime);
-    
-    // Check if slot falls completely within the block's range
-    if (slotStart >= blockStart && slotEnd <= blockEnd) {
-      return block;
-    }
-  }
-  
-  return null;
-}
-
-// Convert "HH:MM" to minutes
 function timeToMinutes(timeStr) {
   const [hours, minutes] = timeStr.split(':').map(Number);
   return hours * 60 + minutes;
 }
 
-// Convert minutes to "HH:MM"
-function minutesToTime(minutes) {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+function requestCancelBooking(rep, day, start, end) {
+  cancelTarget = { rep, day, start, end };
+  cancelMessage.textContent = `Are you sure you want to cancel your booking with ${rep} on ${day} at ${start}–${end}? This will free up the slot for others.`;
+  cancelDialog.showModal();
 }
 
-// Event Listeners setup for Card Elements
-function attachSlotEventListeners() {
-  // 1. Booking buttons
-  document.querySelectorAll('.btn-book').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const { rep, day, start, end, committee } = e.target.dataset;
-      openBookingModal(rep, day, start, end, committee);
-    });
-  });
+function closeCancelDialog() {
+  cancelDialog.close();
+  cancelTarget = null;
+}
 
-  // 2. Cancellation buttons
-  document.querySelectorAll('.btn-cancel').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const { rep, day, start, end } = e.target.dataset;
-      if (confirm(`Are you sure you want to cancel your booking with ${rep} on ${day} at ${start}-${end}?`)) {
-        const success = await dbService.cancelBooking(rep, day, start, end);
-        if (success) {
-          repsData = await dbService.getAvailability();
-          updateBookingStats();
-          renderActiveView();
-        }
+async function executeCancelBooking() {
+  if (!cancelTarget) return;
+
+  const { rep, day, start, end } = cancelTarget;
+  const success = await dbService.cancelBooking(rep, day, start, end);
+
+  closeCancelDialog();
+
+  if (!success) return;
+
+  await refreshData();
+
+  if (!myBookingsView.classList.contains('hidden')) {
+    renderMyBookings();
+  } else if (!fieldDetailView.classList.contains('hidden')) {
+    renderCardView();
+  } else if (repsData) {
+    renderFieldList(repsData.fields);
+  }
+}
+
+function attachCancelListeners(container = document) {
+  container.querySelectorAll('.slot-item.user-booked[data-rep]').forEach((slot) => {
+    const cancelFromSlot = (e) => {
+      e.preventDefault();
+      const { rep, day, start, end } = slot.dataset;
+      requestCancelBooking(rep, day, start, end);
+    };
+
+    slot.addEventListener('click', cancelFromSlot);
+    slot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        cancelFromSlot(e);
       }
     });
   });
 }
 
-// Event Listeners setup for Spreadsheet Grid Elements
-function attachGridEventListeners() {
-  document.querySelectorAll('.grid-cell').forEach(cell => {
-    if (cell.dataset.action === 'book') {
-      cell.addEventListener('click', () => {
-        const { rep, day, start, end, committee } = cell.dataset;
-        openBookingModal(rep, day, start, end, committee);
-      });
-    } else if (cell.dataset.action === 'cancel') {
-      cell.addEventListener('click', async () => {
-        const { rep, day, start, end } = cell.dataset;
-        if (confirm(`Are you sure you want to cancel your booking with ${rep} on ${day} at ${start}-${end}?`)) {
-          const success = await dbService.cancelBooking(rep, day, start, end);
-          if (success) {
-            repsData = await dbService.getAvailability();
-            updateBookingStats();
-            renderActiveView();
-          }
-        }
-      });
-    }
+function attachSlotEventListeners() {
+  document.querySelectorAll('.slot-item.bookable').forEach((slot) => {
+    const openFromSlot = () => {
+      const { rep, day, start, end } = slot.dataset;
+      openBookingModal(rep, day, start, end);
+    };
+
+    slot.addEventListener('click', openFromSlot);
+    slot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openFromSlot();
+      }
+    });
   });
+
+  attachCancelListeners(scheduleCard);
 }
 
-// Open booking dialog
-function openBookingModal(repName, day, startTime, endTime, committee) {
-  currentBookingTarget = { repName, day, startTime, endTime, committee };
-  
+function openBookingModal(repName, day, startTime, endTime) {
+  currentBookingTarget = { repName, day, startTime, endTime };
+
   summaryRep.textContent = repName;
-  summaryCommittee.textContent = committee;
+  summaryCommittee.textContent = activeField;
   summaryDay.textContent = day;
   summaryTime.textContent = `${startTime} - ${endTime}`;
 
-  // Clear inputs
   bookingNameInput.value = '';
   bookingEmailInput.value = '';
-  bookingInterestInput.value = '';
 
   bookingDialog.showModal();
 }
 
-// Close booking dialog
 function closeBookingModal() {
   bookingDialog.close();
   currentBookingTarget = null;
 }
 
-// Setup core application listeners
 function setupEventListeners() {
-  // 1. View Toggles
-  btnCardView.addEventListener('click', () => {
-    btnCardView.classList.add('active');
-    btnCardView.setAttribute('aria-pressed', 'true');
-    btnGridView.classList.remove('active');
-    btnGridView.setAttribute('aria-pressed', 'false');
-    
-    cardViewContainer.classList.add('active');
-    gridViewContainer.classList.remove('active');
-    renderCardView();
+  btnBack.addEventListener('click', showFieldList);
+  btnBackFromBookings.addEventListener('click', showFieldList);
+  btnMyBookings.addEventListener('click', showMyBookings);
+
+  fieldSelect.addEventListener('change', (e) => {
+    setActiveField(e.target.value);
   });
 
-  btnGridView.addEventListener('click', () => {
-    btnGridView.classList.add('active');
-    btnGridView.setAttribute('aria-pressed', 'true');
-    btnCardView.classList.remove('active');
-    btnCardView.setAttribute('aria-pressed', 'false');
-    
-    gridViewContainer.classList.add('active');
-    cardViewContainer.classList.remove('active');
-    renderGridView();
-  });
-
-  // 2. Day Selectors for Grid View
-  gridDaySelector.querySelectorAll('.grid-day-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      gridDaySelector.querySelector('.grid-day-btn.active').classList.remove('active');
-      e.target.classList.add('active');
-      activeDay = e.target.dataset.day;
-      renderGridView();
-    });
-  });
-
-  // 3. Modal Controls
   btnCloseModal.addEventListener('click', closeBookingModal);
   btnCancelForm.addEventListener('click', closeBookingModal);
+  btnCloseCancelDialog.addEventListener('click', closeCancelDialog);
+  btnKeepBooking.addEventListener('click', closeCancelDialog);
+  btnConfirmCancel.addEventListener('click', executeCancelBooking);
 
   bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -498,7 +487,7 @@ function setupEventListeners() {
     const details = {
       name: bookingNameInput.value.trim(),
       email: bookingEmailInput.value.trim(),
-      interest: bookingInterestInput.value.trim()
+      field: activeField,
     };
 
     const success = await dbService.bookSlot(
@@ -511,13 +500,10 @@ function setupEventListeners() {
 
     if (success) {
       closeBookingModal();
-      // Reload combined data structure
-      repsData = await dbService.getAvailability();
-      updateBookingStats();
-      renderActiveView();
+      await refreshData();
+      renderCardView();
     }
   });
 }
 
-// Launch application
 initApp();

@@ -60,11 +60,13 @@ export class DbService {
         const mergedBlocks = [];
 
         for (const block of blocks) {
-          // If the block is bookable, we split it into 15-minute intervals
-          if (block.type === 'bookable') {
+          // For now, treat all scheduled blocks as bookable 15-minute slots.
+          const isBookableBlock = ['bookable', 'drop-in', 'booked', 'unavailable'].includes(block.type);
+
+          if (isBookableBlock) {
             const start = this.timeToMinutes(block.startTime);
             const end = this.timeToMinutes(block.endTime);
-            
+
             for (let t = start; t < end; t += 15) {
               const slotStart = this.minutesToTime(t);
               const slotEnd = this.minutesToTime(t + 15);
@@ -72,7 +74,6 @@ export class DbService {
               const bookingKey = `${repName}_${day}_${slotTime}`;
 
               if (bookings[bookingKey]) {
-                // Booked by the current user
                 mergedBlocks.push({
                   startTime: slotStart,
                   endTime: slotEnd,
@@ -81,7 +82,6 @@ export class DbService {
                   details: bookings[bookingKey]
                 });
               } else {
-                // Still available to book
                 mergedBlocks.push({
                   startTime: slotStart,
                   endTime: slotEnd,
@@ -92,7 +92,6 @@ export class DbService {
               }
             }
           } else {
-            // For drop-in, booked, and unavailable blocks, keep them as is
             mergedBlocks.push(block);
           }
         }
@@ -116,6 +115,10 @@ export class DbService {
     const bookings = this.getBookings();
 
     bookings[bookingKey] = {
+      repName,
+      day,
+      startTime,
+      endTime,
       ...details,
       bookedAt: new Date().toISOString()
     };
@@ -136,6 +139,58 @@ export class DbService {
       return true;
     }
     return false;
+  }
+
+  getBookingsItinerary() {
+    const dayOrder = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
+
+    return Object.entries(this.getBookings())
+      .map(([key, booking]) => {
+        const parsed = this.parseBookingKey(key);
+        return {
+          key,
+          repName: booking.repName || parsed.repName,
+          day: booking.day || parsed.day,
+          startTime: booking.startTime || parsed.startTime,
+          endTime: booking.endTime || parsed.endTime,
+          field: booking.field || '—',
+          name: booking.name,
+          email: booking.email,
+          bookedAt: booking.bookedAt,
+        };
+      })
+      .sort((a, b) => {
+        const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+        if (dayDiff !== 0) return dayDiff;
+        return this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime);
+      });
+  }
+
+  parseBookingKey(key) {
+    const slotTime = key.slice(key.lastIndexOf('_') + 1);
+    const remainder = key.slice(0, key.lastIndexOf('_'));
+    const day = remainder.slice(remainder.lastIndexOf('_') + 1);
+    const repName = remainder.slice(0, remainder.lastIndexOf('_'));
+    const [startTime, endTime] = slotTime.split('-');
+
+    return { repName, day, startTime, endTime };
+  }
+
+  splitIntoFifteenMinuteSlots(block, type) {
+    const slots = [];
+    const start = this.timeToMinutes(block.startTime);
+    const end = this.timeToMinutes(block.endTime);
+
+    for (let t = start; t < end; t += 15) {
+      slots.push({
+        startTime: this.minutesToTime(t),
+        endTime: this.minutesToTime(t + 15),
+        type,
+        label: block.label || (type === 'drop-in' ? 'Drop-in' : 'Bookable')
+      });
+    }
+
+    return slots;
   }
 
   // Helpers to convert time formats
