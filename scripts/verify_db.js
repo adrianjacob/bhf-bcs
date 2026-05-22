@@ -55,18 +55,18 @@ async function testDbService() {
   let monHelena = helena.schedule['Monday 1st'];
   
   console.log('Helena Monday schedule length:', monHelena.length);
-  // Helena has a bookable slot from 13:30 to 14:15 (45 mins).
-  // This should be split into four 10-minute slots; the last 5 mins are unused:
-  // 13:30-13:40, 13:40-13:50, 13:50-14:00, 14:00-14:10.
+  // Helena has a bookable slot from 13:45 to 14:45 (60 mins).
+  // This should be split into six 10-minute slots:
+  // 13:45-13:55, 13:55-14:05, 14:05-14:15, 14:15-14:25, 14:25-14:35, 14:35-14:45.
   const bookableSlots = monHelena.filter(s => s.type === 'bookable');
-  if (bookableSlots.length !== 4) {
-    throw new Error(`Expected 4 bookable slots for Helena on Monday, got ${bookableSlots.length}`);
+  if (bookableSlots.length !== 6) {
+    throw new Error(`Expected 6 bookable slots for Helena on Monday, got ${bookableSlots.length}`);
   }
   console.log('✓ Split bookable slots correctly:', bookableSlots.map(s => `${s.startTime}-${s.endTime}`));
 
   // 3. Book a slot
-  console.log('Booking Helena Monday 13:30-13:40...');
-  await dbService.bookSlot('Helena T', 'Monday 1st', '13:30', '13:40', {
+  console.log('Booking Helena Monday 13:45-13:55...');
+  await dbService.bookSlot('Helena T', 'Monday 1st', '13:45', '13:55', {
     name: 'Test User',
     email: 'test@example.com',
     interest: 'Translational Awards inquiry'
@@ -76,19 +76,19 @@ async function testDbService() {
   state = await dbService.getAvailability();
   monHelena = state.representatives['Helena T'].schedule['Monday 1st'];
   const userBooked = monHelena.find(s => s.type === 'user-booked');
-  if (!userBooked || userBooked.startTime !== '13:30' || userBooked.endTime !== '13:40') {
+  if (!userBooked || userBooked.startTime !== '13:45' || userBooked.endTime !== '13:55') {
     throw new Error('Booking was not retrieved correctly');
   }
   console.log('✓ Successfully retrieved booked slot:', userBooked);
   
   // 5. Cancel booking
   console.log('Cancelling booking...');
-  await dbService.cancelBooking('Helena T', 'Monday 1st', '13:30', '13:40');
+  await dbService.cancelBooking('Helena T', 'Monday 1st', '13:45', '13:55');
   
   // 6. Verify cancelled state
   state = await dbService.getAvailability();
   monHelena = state.representatives['Helena T'].schedule['Monday 1st'];
-  const cancelledSlot = monHelena.find(s => s.startTime === '13:30' && s.endTime === '13:40');
+  const cancelledSlot = monHelena.find(s => s.startTime === '13:45' && s.endTime === '13:55');
   if (!cancelledSlot || cancelledSlot.type !== 'bookable') {
     throw new Error('Booking cancellation failed or slot did not revert to bookable');
   }

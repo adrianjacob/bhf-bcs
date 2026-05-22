@@ -39,9 +39,6 @@
   "representatives": {
     "Laura M": {
       "name": "Laura M",
-      "committee": [
-        "Discovery Fellowships"
-      ],
       "role": "Fellows (Disc)",
       "schedule": {
         "Monday 1st": [
@@ -55,96 +52,96 @@
         "Tuesday 2nd": [
           {
             "startTime": "14:00",
-            "endTime": "14:30",
+            "endTime": "14:45",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Discovery Fellowships"
+      ]
     },
     "Sarah K": {
       "name": "Sarah K",
-      "committee": [
-        "Clinical Fellowships"
-      ],
       "role": "Fellows (Clin)",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "15:30",
-            "endTime": "16:00",
+            "startTime": "15:45",
+            "endTime": "16:15",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ],
-        "Tuesday 2nd": [],
-        "Wednesday 3rd": [
+        "Tuesday 2nd": [
           {
             "startTime": "16:00",
-            "endTime": "16:45",
+            "endTime": "17:00",
             "type": "bookable",
             "label": "Bookable slots"
           }
-        ]
-      }
+        ],
+        "Wednesday 3rd": []
+      },
+      "committee": [
+        "Clinical Fellowships"
+      ]
     },
     "Barbara V": {
       "name": "Barbara V",
-      "committee": [
-        "Clinical Fellowships"
-      ],
       "role": "Fellows (Clin)",
       "schedule": {
         "Monday 1st": [],
         "Tuesday 2nd": [
           {
             "startTime": "09:30",
-            "endTime": "10:00",
+            "endTime": "10:15",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Clinical Fellowships"
+      ]
     },
     "Aimee E": {
       "name": "Aimee E",
-      "committee": [
-        "Project Grants"
-      ],
       "role": "Projects",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "15:15",
-            "endTime": "16:00",
+            "startTime": "15:30",
+            "endTime": "16:30",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ],
         "Tuesday 2nd": [
           {
-            "startTime": "10:15",
-            "endTime": "11:00",
+            "startTime": "10:30",
+            "endTime": "11:15",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Project Grants"
+      ]
     },
     "Phoebe K": {
       "name": "Phoebe K",
-      "committee": [
-        "Clinical Studies"
-      ],
       "role": "CSC",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "14:00",
-            "endTime": "14:45",
+            "startTime": "14:15",
+            "endTime": "15:00",
             "type": "bookable",
             "label": "Bookable slots"
           }
@@ -152,38 +149,38 @@
         "Tuesday 2nd": [],
         "Wednesday 3rd": [
           {
-            "startTime": "09:15",
-            "endTime": "10:00",
+            "startTime": "09:30",
+            "endTime": "10:15",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ]
-      }
+      },
+      "committee": [
+        "Clinical Studies"
+      ]
     },
     "Shannon A": {
       "name": "Shannon A",
-      "committee": [
-        "Clinical Studies"
-      ],
       "role": "CSC",
       "schedule": {
         "Monday 1st": [],
         "Tuesday 2nd": [],
         "Wednesday 3rd": [
           {
-            "startTime": "09:15",
-            "endTime": "10:00",
+            "startTime": "09:30",
+            "endTime": "10:15",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ]
-      }
+      },
+      "committee": [
+        "Clinical Studies"
+      ]
     },
     "Andrew L": {
       "name": "Andrew L",
-      "committee": [
-        "Healthcare Implementation Awards"
-      ],
       "role": "HIF",
       "schedule": {
         "Monday 1st": [
@@ -194,27 +191,27 @@
             "label": "Blocked"
           },
           {
-            "startTime": "12:45",
-            "endTime": "13:30",
+            "startTime": "13:00",
+            "endTime": "13:45",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Tuesday 2nd": [],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Healthcare Implementation Awards"
+      ]
     },
     "Helena T": {
       "name": "Helena T",
-      "committee": [
-        "Translational Awards"
-      ],
       "role": "TAC",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "13:30",
-            "endTime": "14:15",
+            "startTime": "13:45",
+            "endTime": "14:45",
             "type": "bookable",
             "label": "Bookable slots"
           }
@@ -222,51 +219,51 @@
         "Tuesday 2nd": [],
         "Wednesday 3rd": [
           {
-            "startTime": "11:00",
-            "endTime": "12:00",
+            "startTime": "11:30",
+            "endTime": "12:30",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ]
-      }
+      },
+      "committee": [
+        "Translational Awards"
+      ]
     },
     "Abby W": {
       "name": "Abby W",
-      "committee": [
-        "Discovery Research"
-      ],
       "role": "HoDRP",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "14:45",
-            "endTime": "15:45",
+            "startTime": "15:00",
+            "endTime": "16:00",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ],
         "Tuesday 2nd": [
           {
-            "startTime": "10:45",
-            "endTime": "11:30",
+            "startTime": "11:15",
+            "endTime": "12:15",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Discovery Research"
+      ]
     },
     "Kieran P": {
       "name": "Kieran P",
-      "committee": [
-        "Clinical Research"
-      ],
       "role": "HoCRP",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "11:45",
-            "endTime": "12:45",
+            "startTime": "12:30",
+            "endTime": "13:30",
             "type": "drop-in",
             "label": "Drop-in"
           }
@@ -274,70 +271,70 @@
         "Tuesday 2nd": [],
         "Wednesday 3rd": [
           {
-            "startTime": "09:45",
-            "endTime": "10:45",
+            "startTime": "10:15",
+            "endTime": "11:15",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ]
-      }
+      },
+      "committee": [
+        "Clinical Research"
+      ]
     },
     "Subreena S": {
       "name": "Subreena S",
-      "committee": [
-        "Programme Grants"
-      ],
       "role": "CPGC",
       "schedule": {
         "Monday 1st": [],
         "Tuesday 2nd": [
           {
-            "startTime": "09:15",
-            "endTime": "10:00",
+            "startTime": "09:30",
+            "endTime": "10:15",
             "type": "bookable",
             "label": "Bookable slots"
           },
           {
-            "startTime": "10:00",
-            "endTime": "10:30",
+            "startTime": "10:15",
+            "endTime": "11:00",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Programme Grants"
+      ]
     },
     "Zoe H": {
       "name": "Zoe H",
-      "committee": [
-        "Special Programmes"
-      ],
       "role": "Special Programmes",
       "schedule": {
         "Monday 1st": [
           {
-            "startTime": "14:45",
-            "endTime": "15:45",
+            "startTime": "15:00",
+            "endTime": "16:00",
             "type": "bookable",
             "label": "Bookable slots"
           }
         ],
         "Tuesday 2nd": [
           {
-            "startTime": "10:00",
-            "endTime": "10:30",
+            "startTime": "10:45",
+            "endTime": "11:15",
             "type": "drop-in",
             "label": "Drop-in"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Special Programmes"
+      ]
     },
     "Ollie H": {
       "name": "Ollie H",
-      "committee": [
-        "Filming"
-      ],
       "role": "Filming",
       "schedule": {
         "Monday 1st": [
@@ -345,13 +342,13 @@
             "startTime": "14:00",
             "endTime": "14:15",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Chris"
           },
           {
             "startTime": "14:30",
             "endTime": "14:45",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Kathryn"
           }
         ],
         "Tuesday 2nd": [
@@ -359,29 +356,75 @@
             "startTime": "09:30",
             "endTime": "09:45",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Marc?"
           },
           {
             "startTime": "10:00",
             "endTime": "10:15",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Marc?"
           },
           {
             "startTime": "11:00",
             "endTime": "11:15",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Marc?"
           },
           {
             "startTime": "15:15",
             "endTime": "15:30",
             "type": "bookable",
-            "label": "Bookable slots"
+            "label": "Paz?"
           }
         ],
         "Wednesday 3rd": []
-      }
+      },
+      "committee": [
+        "Filming"
+      ]
+    }
+  },
+  "externalBookings": {
+    "Helena T": {
+      "Monday 1st": [
+        {
+          "startTime": "13:45",
+          "endTime": "14:00",
+          "bookedBy": "Dr. Sarah Collins"
+        }
+      ]
+    },
+    "Andrew L": {
+      "Monday 1st": [
+        {
+          "startTime": "13:00",
+          "endTime": "13:15",
+          "bookedBy": "Prof. James Whitfield"
+        }
+      ]
+    },
+    "Laura M": {
+      "Monday 1st": [
+        {
+          "startTime": "14:30",
+          "endTime": "14:45",
+          "bookedBy": "Dr. Amir Patel"
+        }
+      ]
+    },
+    "Abby W": {
+      "Monday 1st": [
+        {
+          "startTime": "15:00",
+          "endTime": "15:15",
+          "bookedBy": "Dr. Ruth Hammond"
+        },
+        {
+          "startTime": "15:15",
+          "endTime": "15:30",
+          "bookedBy": "Prof. Tom Gallagher"
+        }
+      ]
     }
   }
 }
