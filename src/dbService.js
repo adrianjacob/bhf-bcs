@@ -91,7 +91,7 @@ export class DbService {
               }
             }
           } else if (block.type === 'drop-in') {
-            mergedBlocks.push(...this.splitTimeBlockIntoSlots(block, 'drop-in'));
+            mergedBlocks.push(block);
           } else {
             mergedBlocks.push(block);
           }
@@ -175,23 +175,6 @@ export class DbService {
     const [startTime, endTime] = slotTime.split('-');
 
     return { repName, day, startTime, endTime };
-  }
-
-  splitTimeBlockIntoSlots(block, type) {
-    const slots = [];
-    const start = this.timeToMinutes(block.startTime);
-    const end = this.timeToMinutes(block.endTime);
-
-    for (let t = start; t + SLOT_DURATION_MINUTES <= end; t += SLOT_DURATION_MINUTES) {
-      slots.push({
-        startTime: this.minutesToTime(t),
-        endTime: this.minutesToTime(t + SLOT_DURATION_MINUTES),
-        type,
-        label: block.label || (type === 'drop-in' ? 'Drop-in' : 'Bookable')
-      });
-    }
-
-    return slots;
   }
 
   // Helpers to convert time formats
