@@ -1,36 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@font-face {
+  font-family: "BHF Beats Bold";
+  src:
+    url("/BHFBeats-Bold.woff2") format("woff2"),
+    url("/BHFBeats-Bold.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 
 :root {
-  --bhf-red: #ED002D;
-  --bhf-red-hover: #C50024;
-  --bhf-dark: #0A0A0A;
-  --bhf-text: #1C1C1C;
+  --bhf-red: #ed002d;
+  --bhf-red-hover: #c50024;
+  --bhf-dark: #0a0a0a;
+  --bhf-text: #1c1c1c;
   --bhf-text-light: #595959;
-  --bhf-bg-light: #F8F9FA;
-  --bhf-border: #E5E5E5;
-  
+  --bhf-bg-light: #f8f9fa;
+  --bhf-border: #e5e5e5;
+
   /* Spreadsheet Colors */
-  --sheet-blue-bg: #E3F2FD;
-  --sheet-blue-text: #0D47A1;
-  --sheet-blue-border: #90CAF9;
-  
-  --sheet-gray-bg: #E0E0E0;
+  --sheet-blue-bg: #e3f2fd;
+  --sheet-blue-text: #0d47a1;
+  --sheet-blue-border: #90caf9;
+
+  --sheet-gray-bg: #e0e0e0;
   --sheet-gray-text: #616161;
-  --sheet-gray-border: #BDBDBD;
-  
-  --sheet-green-bg: #E8F5E9;
-  --sheet-green-text: #1B5E20;
-  --sheet-green-border: #A5D6A7;
-  
-  --sheet-yellow-bg: #FFFDE7;
-  --sheet-yellow-text: #F57F17;
-  --sheet-yellow-border: #FFF59D;
+  --sheet-gray-border: #bdbdbd;
 
-  --user-booked-bg: #EDE7F6;
-  --user-booked-text: #4A148C;
-  --user-booked-border: #B39DDB;
+  --sheet-green-bg: #e8f5e9;
+  --sheet-green-text: #1b5e20;
+  --sheet-green-border: #a5d6a7;
 
-  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --sheet-yellow-bg: #fffde7;
+  --sheet-yellow-text: #f57f17;
+  --sheet-yellow-border: #fff59d;
+
+  --user-booked-bg: #ede7f6;
+  --user-booked-text: #4a148c;
+  --user-booked-border: #b39ddb;
+
+  --font-family:
+    Trebuchet, "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode",
+    "Lucida Sans", Tahoma, sans-serif;
   --pill-radius: 9999px;
 }
 
@@ -47,6 +57,14 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   padding-bottom: 80px;
+}
+
+h1,
+h2,
+h3 {
+  font-family:
+    "BHF Beats Bold", Trebuchet, "Trebuchet MS", "Lucida Grande",
+    "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
 }
 
 /* Header & Navigation */
@@ -93,7 +111,7 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: var(--pill-radius);
@@ -122,7 +140,7 @@ main {
 
 /* View Selector & Section Intro */
 .intro-section {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 1px solid var(--bhf-border);
   border-radius: 12px;
   padding: 24px;
@@ -183,7 +201,7 @@ main {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 1px solid var(--bhf-border);
   border-radius: 12px;
   padding: 18px 24px;
@@ -265,7 +283,7 @@ main {
   padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid var(--bhf-border);
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   font-family: var(--font-family);
   font-size: 15px;
   font-weight: 600;
@@ -288,7 +306,7 @@ main {
 
 /* --- CARD VIEW --- */
 .schedule-card {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 1px solid var(--bhf-border);
   border-radius: 12px;
   padding: 24px;
@@ -383,8 +401,8 @@ main {
 
 /* Slot Styling states */
 .slot-item.drop-in {
-  background-color: #F3F3F3;
-  border-color: #E0E0E0;
+  background-color: #f3f3f3;
+  border-color: #e0e0e0;
   color: var(--bhf-text-light);
   padding: 8px 14px;
   font-size: 13px;
@@ -431,7 +449,7 @@ main {
 .slot-item.bookable {
   background-color: var(--bhf-red);
   border: 2px solid var(--bhf-red);
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
   padding: 12px 16px;
   box-shadow: 0 2px 10px rgba(237, 0, 45, 0.2);
@@ -440,12 +458,12 @@ main {
 .slot-item.bookable .slot-time,
 .slot-item.bookable .slot-time strong {
   font-size: 15px;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .slot-item.bookable .slot-rep-name {
   font-size: 14px;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .slot-item.bookable:hover {
@@ -455,13 +473,13 @@ main {
 }
 
 .slot-item.bookable:focus-visible {
-  outline: 2px solid #FFFFFF;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 
 .slot-item.bookable .btn-book {
   pointer-events: none;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   color: var(--bhf-red);
   padding: 8px 18px;
   border-radius: var(--pill-radius);
@@ -477,7 +495,7 @@ main {
 }
 
 .slot-item.user-booked:hover {
-  background-color: #D1C4E9;
+  background-color: #d1c4e9;
 }
 
 .slot-item.user-booked:focus-visible {
@@ -519,7 +537,7 @@ main {
 .btn-book {
   display: inline-block;
   background-color: var(--bhf-red);
-  color: #FFFFFF;
+  color: #ffffff;
   border: none;
   font-family: var(--font-family);
   font-size: 13px;
@@ -553,7 +571,7 @@ main {
 .empty-state {
   text-align: center;
   padding: 48px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 1px solid var(--bhf-border);
   border-radius: 12px;
   color: var(--bhf-text-light);
@@ -585,7 +603,7 @@ dialog::backdrop {
 
 .modal-header {
   background-color: var(--bhf-red);
-  color: #FFFFFF;
+  color: #ffffff;
   padding: 20px 24px;
   display: flex;
   justify-content: space-between;
@@ -600,7 +618,7 @@ dialog::backdrop {
 .btn-close-modal {
   background: none;
   border: none;
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 24px;
   cursor: pointer;
   opacity: 0.8;
@@ -665,7 +683,9 @@ dialog::backdrop {
   border-radius: 8px;
   font-family: var(--font-family);
   font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form-group input:focus,
@@ -702,7 +722,7 @@ dialog::backdrop {
 .btn-submit-form {
   background-color: var(--bhf-red);
   border: none;
-  color: #FFFFFF;
+  color: #ffffff;
   padding: 10px 24px;
   border-radius: var(--pill-radius);
   font-family: var(--font-family);
