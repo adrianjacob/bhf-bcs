@@ -14,6 +14,7 @@ const AVAILABILITY_URL = '/data/availability.json';
 const AVAILABILITY_DOC_PATH = ['app_data', 'availability'];
 const BOOKINGS_COLLECTION = 'bookings';
 const SLOT_DURATION_MINUTES = 10;
+const CLIENT_ID_STORAGE_KEY = 'bhf_bcs_client_id';
 
 export class DbService {
   constructor() {
@@ -21,6 +22,7 @@ export class DbService {
     this.bookings = {};
     this.db = null;
     this.initPromise = null;
+    this.clientId = null;
   }
 
   async init() {
@@ -35,6 +37,7 @@ export class DbService {
   async initializeFromFirestore() {
     try {
       this.db = getFirestoreDb();
+      this.clientId = this.getOrCreateClientId();
       const availabilityRef = doc(this.db, ...AVAILABILITY_DOC_PATH);
       const availabilitySnapshot = await getDoc(availabilityRef);
 
@@ -75,7 +78,17 @@ export class DbService {
   }
 
   getBookings() {
-    return this.bookings;
+    return this.getOwnBookings();
+  }
+
+  getOwnBookings() {
+    const ownBookings = {};
+    Object.entries(this.bookings).forEach(([key, booking]) => {
+      if (booking.ownerId && booking.ownerId === this.clientId) {
+        ownBookings[key] = booking;
+      }
+    });
+    return ownBookings;
   }
 
   async getAvailability() {
@@ -102,12 +115,14 @@ export class DbService {
               const bookingKey = `${repName}_${day}_${slotTime}`;
 
               if (bookings[bookingKey]) {
+                const booking = bookings[bookingKey];
+                const isOwnBooking = booking.ownerId && booking.ownerId === this.clientId;
                 mergedBlocks.push({
                   startTime: slotStart,
                   endTime: slotEnd,
-                  type: 'user-booked',
-                  label: 'Booked by You',
-                  details: bookings[bookingKey]
+                  type: isOwnBooking ? 'user-booked' : 'booked',
+                  label: isOwnBooking ? 'Booked by You' : 'Booked',
+                  details: booking
                 });
               } else {
                 mergedBlocks.push({
@@ -148,7 +163,8 @@ export class DbService {
       startTime,
       endTime,
       ...details,
-      bookedAt: new Date().toISOString()
+      bookedAt: new Date().toISOString(),
+      ownerId: this.clientId
     };
 
     try {
@@ -177,7 +193,8 @@ export class DbService {
     const slotTime = `${startTime}-${endTime}`;
     const bookingKey = `${repName}_${day}_${slotTime}`;
 
-    if (this.bookings[bookingKey]) {
+    const booking = this.bookings[bookingKey];
+    if (booking && booking.ownerId === this.clientId) {
       await deleteDoc(doc(this.db, BOOKINGS_COLLECTION, bookingKey));
       delete this.bookings[bookingKey];
       return true;
@@ -188,7 +205,7 @@ export class DbService {
   getBookingsItinerary() {
     const dayOrder = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
 
-    return Object.entries(this.bookings)
+    return Object.entries(this.getOwnBookings())
       .map(([key, booking]) => {
         const parsed = this.parseBookingKey(key);
         return {
@@ -229,6 +246,19 @@ export class DbService {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  }
+
+  getOrCreateClientId() {
+    const existing = localStorage.getItem(CLIENT_ID_STORAGE_KEY);
+    if (existing) return existing;
+
+    const generated =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `client_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+    localStorage.setItem(CLIENT_ID_STORAGE_KEY, generated);
+    return generated;
   }
 
   async subscribeToChanges(onChange, onError) {

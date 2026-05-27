@@ -226,11 +226,9 @@ function getSessionsForFieldOnDay(day) {
   });
 
   sessions.sort((a, b) => {
-    const typeOrder = { bookable: 0, 'user-booked': 1, booked: 2, 'drop-in': 3 };
-    const typeDiff =
-      (typeOrder[a.block.type] ?? 4) - (typeOrder[b.block.type] ?? 4);
-    if (typeDiff !== 0) return typeDiff;
-    return timeToMinutes(a.block.startTime) - timeToMinutes(b.block.startTime);
+    const timeDiff = timeToMinutes(a.block.startTime) - timeToMinutes(b.block.startTime);
+    if (timeDiff !== 0) return timeDiff;
+    return timeToMinutes(a.block.endTime) - timeToMinutes(b.block.endTime);
   });
 
   return sessions;
