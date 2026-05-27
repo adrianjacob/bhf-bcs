@@ -1,62 +1,82 @@
-// Database service for managing representative availability and booking states.
-// This is designed to act as a clean data layer that can be easily swapped for Firebase.
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { getFirestoreDb } from './firebaseClient.js';
 
-const LOCAL_STORAGE_KEY = 'bhf_bcs_bookings';
 const AVAILABILITY_URL = '/data/availability.json';
+const AVAILABILITY_DOC_PATH = ['app_data', 'availability'];
+const BOOKINGS_COLLECTION = 'bookings';
 const SLOT_DURATION_MINUTES = 10;
 
 export class DbService {
   constructor() {
     this.data = null;
+    this.bookings = {};
+    this.db = null;
+    this.initPromise = null;
   }
 
-  // Load the initial mock database
   async init() {
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = this.initializeFromFirestore();
+    return this.initPromise;
+  }
+
+  async initializeFromFirestore() {
     try {
-      const response = await fetch(AVAILABILITY_URL);
-      if (!response.ok) {
-        throw new Error('Failed to load availability data');
+      this.db = getFirestoreDb();
+      const availabilityRef = doc(this.db, ...AVAILABILITY_DOC_PATH);
+      const availabilitySnapshot = await getDoc(availabilityRef);
+
+      if (availabilitySnapshot.exists()) {
+        this.data = availabilitySnapshot.data();
+      } else {
+        const response = await fetch(AVAILABILITY_URL);
+        if (!response.ok) {
+          throw new Error('Failed to load fallback availability data');
+        }
+        const seedData = await response.json();
+        await setDoc(availabilityRef, seedData);
+        this.data = seedData;
       }
-      this.data = await response.json();
+
+      await this.loadBookings();
     } catch (error) {
-      console.error('Error initializing dbService:', error);
+      this.initPromise = null;
+      console.error('Error initializing dbService with Firestore:', error);
       throw error;
     }
   }
 
-  // Get all fields/areas
+  async loadBookings() {
+    const snapshot = await getDocs(collection(this.db, BOOKINGS_COLLECTION));
+    this.bookings = {};
+    snapshot.forEach((bookingDoc) => {
+      this.bookings[bookingDoc.id] = bookingDoc.data();
+    });
+  }
+
   getFields() {
     return this.data ? this.data.fields : {};
   }
 
-  // Get all representatives
   getRepresentatives() {
     return this.data ? this.data.representatives : {};
   }
 
-  // Get list of active bookings from local storage
   getBookings() {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
+    return this.bookings;
   }
 
-  // Save bookings to local storage
-  saveBookings(bookings) {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(bookings));
-  }
-
-  // Get the combined availability data (JSON data + user bookings)
   async getAvailability() {
     if (!this.data) {
       await this.init();
     }
 
-    const bookings = this.getBookings();
-    
-    // Deep clone the representatives data to avoid mutating original state
+    const bookings = this.bookings;
     const reps = JSON.parse(JSON.stringify(this.data.representatives));
 
-    // Iterate through all representatives and merge their schedules with local bookings
     for (const [repName, rep] of Object.entries(reps)) {
       for (const [day, blocks] of Object.entries(rep.schedule)) {
         const mergedBlocks = [];
@@ -96,8 +116,7 @@ export class DbService {
             mergedBlocks.push(block);
           }
         }
-        
-        // Sort blocks by start time
+
         mergedBlocks.sort((a, b) => this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime));
         rep.schedule[day] = mergedBlocks;
       }
@@ -109,13 +128,11 @@ export class DbService {
     };
   }
 
-  // Create a booking
   async bookSlot(repName, day, startTime, endTime, details) {
+    await this.init();
     const slotTime = `${startTime}-${endTime}`;
     const bookingKey = `${repName}_${day}_${slotTime}`;
-    const bookings = this.getBookings();
-
-    bookings[bookingKey] = {
+    const bookingPayload = {
       repName,
       day,
       startTime,
@@ -124,19 +141,19 @@ export class DbService {
       bookedAt: new Date().toISOString()
     };
 
-    this.saveBookings(bookings);
+    await setDoc(doc(this.db, BOOKINGS_COLLECTION, bookingKey), bookingPayload);
+    this.bookings[bookingKey] = bookingPayload;
     return true;
   }
 
-  // Cancel a booking
   async cancelBooking(repName, day, startTime, endTime) {
+    await this.init();
     const slotTime = `${startTime}-${endTime}`;
     const bookingKey = `${repName}_${day}_${slotTime}`;
-    const bookings = this.getBookings();
 
-    if (bookings[bookingKey]) {
-      delete bookings[bookingKey];
-      this.saveBookings(bookings);
+    if (this.bookings[bookingKey]) {
+      await deleteDoc(doc(this.db, BOOKINGS_COLLECTION, bookingKey));
+      delete this.bookings[bookingKey];
       return true;
     }
     return false;
@@ -145,7 +162,7 @@ export class DbService {
   getBookingsItinerary() {
     const dayOrder = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
 
-    return Object.entries(this.getBookings())
+    return Object.entries(this.bookings)
       .map(([key, booking]) => {
         const parsed = this.parseBookingKey(key);
         return {
@@ -177,7 +194,6 @@ export class DbService {
     return { repName, day, startTime, endTime };
   }
 
-  // Helpers to convert time formats
   timeToMinutes(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
     return hours * 60 + minutes;

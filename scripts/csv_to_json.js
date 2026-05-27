@@ -42,10 +42,10 @@ const representatives = {
     "role": "Fellows (Disc)",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "14:15", "endTime": "15:00", "type": "drop-in", "label": "Drop-in" }
+        { "startTime": "14:15", "endTime": "15:15", "type": "drop-in", "label": "Drop-in" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "14:00", "endTime": "14:45", "type": "bookable", "label": "Bookable slots" }
+        { "startTime": "14:00", "endTime": "15:00", "type": "bookable", "label": "Bookable slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -55,12 +55,12 @@ const representatives = {
     "role": "Fellows (Clin)",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "15:45", "endTime": "16:15", "type": "drop-in", "label": "Drop-in" }
+        { "startTime": "16:00", "endTime": "17:00", "type": "drop-in", "label": "Drop-in" }
       ],
-      "Tuesday 2nd": [],
-      "Wednesday 3rd": [
+      "Tuesday 2nd": [
         { "startTime": "16:00", "endTime": "17:00", "type": "bookable", "label": "Bookable slots" }
-      ]
+      ],
+      "Wednesday 3rd": []
     }
   },
   "Barbara V": {
@@ -127,12 +127,12 @@ const representatives = {
     "name": "Helena T",
     "role": "TAC",
     "schedule": {
-      "Monday 1st": [
-        { "startTime": "13:45", "endTime": "14:45", "type": "bookable", "label": "Bookable slots" }
+      "Monday 1st": [],
+      "Tuesday 2nd": [
+        { "startTime": "13:30", "endTime": "14:30", "type": "bookable", "label": "Bookable slots" }
       ],
-      "Tuesday 2nd": [],
       "Wednesday 3rd": [
-        { "startTime": "11:30", "endTime": "12:30", "type": "drop-in", "label": "Drop-in" }
+        { "startTime": "11:15", "endTime": "12:15", "type": "drop-in", "label": "Drop-in" }
       ]
     }
   },
@@ -144,7 +144,7 @@ const representatives = {
         { "startTime": "15:00", "endTime": "16:00", "type": "drop-in", "label": "Drop-in" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "11:15", "endTime": "12:15", "type": "bookable", "label": "Bookable slots" }
+        { "startTime": "11:00", "endTime": "12:00", "type": "bookable", "label": "Bookable slots" }
       ],
       "Wednesday 3rd": []
     }
@@ -158,7 +158,7 @@ const representatives = {
       ],
       "Tuesday 2nd": [],
       "Wednesday 3rd": [
-        { "startTime": "10:15", "endTime": "11:15", "type": "bookable", "label": "Bookable slots" }
+        { "startTime": "10:00", "endTime": "11:00", "type": "bookable", "label": "Bookable slots" }
       ]
     }
   },
@@ -179,10 +179,10 @@ const representatives = {
     "role": "Special Programmes",
     "schedule": {
       "Monday 1st": [
-        { "startTime": "15:00", "endTime": "16:00", "type": "bookable", "label": "Bookable slots" }
+        { "startTime": "15:00", "endTime": "15:40", "type": "bookable", "label": "Bookable slots" }
       ],
       "Tuesday 2nd": [
-        { "startTime": "10:45", "endTime": "11:15", "type": "drop-in", "label": "Drop-in" }
+        { "startTime": "10:30", "endTime": "11:15", "type": "drop-in", "label": "Drop-in" }
       ],
       "Wednesday 3rd": []
     }

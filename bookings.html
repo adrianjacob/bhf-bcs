@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BHF Staff Bookings</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header-container">
+        <div class="logo-section">
+          <img
+            class="bhf-logo"
+            src="/bhf-logo-white.svg"
+            width="124"
+            height="35"
+            alt="British Heart Foundation"
+          />
+          <p class="header-tagline">BCS Conference 2026</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro-section">
+        <h1 class="bookings-title">Staff Bookings</h1>
+        <p class="intro-note">
+          This page is for on-site staff only. Enter the shared password to view all bookings.
+        </p>
+      </section>
+
+      <section id="access-card" class="intro-section">
+        <form id="staff-login-form" class="staff-login-form">
+          <div class="form-group">
+            <label for="staff-password">Shared password</label>
+            <input
+              type="password"
+              id="staff-password"
+              required
+              placeholder="Enter staff password"
+              autocomplete="current-password"
+            />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit-form">Unlock bookings</button>
+          </div>
+          <p id="login-error" class="login-error hidden"></p>
+        </form>
+      </section>
+
+      <section id="bookings-card" class="schedule-card hidden">
+        <div class="bookings-toolbar">
+          <p id="bookings-count" class="bookings-count"></p>
+          <div class="bookings-toolbar-actions">
+            <button id="btn-refresh-bookings" type="button" class="btn-cancel-form">Refresh</button>
+            <button id="btn-lock-bookings" type="button" class="btn-submit-form">Lock</button>
+          </div>
+        </div>
+        <div class="bookings-table-wrap">
+          <table class="bookings-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Representative</th>
+                <th>Field</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Booked at</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/bookings.js"></script>
+  </body>
+</html>

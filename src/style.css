@@ -298,6 +298,21 @@ main {
   max-width: 800px;
 }
 
+.bookings-title {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.staff-login-form {
+  max-width: 460px;
+}
+
+.login-error {
+  color: var(--bhf-red);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
 .intro-section p {
   color: var(--bhf-text-light);
   font-size: 15px;
@@ -320,6 +335,55 @@ main {
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--bhf-border);
+}
+
+.bookings-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.bookings-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bhf-text-light);
+}
+
+.bookings-toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bookings-table-wrap {
+  overflow-x: auto;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.bookings-table th,
+.bookings-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--bhf-border);
+  font-size: 13px;
+}
+
+.bookings-table th {
+  color: var(--bhf-text-light);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bookings-empty {
+  color: var(--bhf-text-light);
+  font-style: italic;
 }
 
 .slot-item {
