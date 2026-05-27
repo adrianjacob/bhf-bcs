@@ -1,4 +1,13 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore';
 import { getFirestoreDb } from './firebaseClient.js';
 
 const AVAILABILITY_URL = '/data/availability.json';
@@ -132,6 +141,7 @@ export class DbService {
     await this.init();
     const slotTime = `${startTime}-${endTime}`;
     const bookingKey = `${repName}_${day}_${slotTime}`;
+    const bookingRef = doc(this.db, BOOKINGS_COLLECTION, bookingKey);
     const bookingPayload = {
       repName,
       day,
@@ -141,9 +151,25 @@ export class DbService {
       bookedAt: new Date().toISOString()
     };
 
-    await setDoc(doc(this.db, BOOKINGS_COLLECTION, bookingKey), bookingPayload);
-    this.bookings[bookingKey] = bookingPayload;
-    return true;
+    try {
+      const result = await runTransaction(this.db, async (transaction) => {
+        const existing = await transaction.get(bookingRef);
+        if (existing.exists()) {
+          return { success: false, reason: 'already-booked' };
+        }
+        transaction.set(bookingRef, bookingPayload);
+        return { success: true };
+      });
+
+      if (result.success) {
+        this.bookings[bookingKey] = bookingPayload;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error booking slot:', error);
+      return { success: false, reason: 'error' };
+    }
   }
 
   async cancelBooking(repName, day, startTime, endTime) {
@@ -203,6 +229,52 @@ export class DbService {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  }
+
+  async subscribeToChanges(onChange, onError) {
+    await this.init();
+
+    const emit = async () => {
+      try {
+        const availability = await this.getAvailability();
+        onChange(availability);
+      } catch (error) {
+        if (onError) onError(error);
+      }
+    };
+
+    const availabilityRef = doc(this.db, ...AVAILABILITY_DOC_PATH);
+    const unsubscribeAvailability = onSnapshot(
+      availabilityRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          this.data = snapshot.data();
+          emit();
+        }
+      },
+      (error) => {
+        if (onError) onError(error);
+      }
+    );
+
+    const unsubscribeBookings = onSnapshot(
+      collection(this.db, BOOKINGS_COLLECTION),
+      (snapshot) => {
+        this.bookings = {};
+        snapshot.forEach((bookingDoc) => {
+          this.bookings[bookingDoc.id] = bookingDoc.data();
+        });
+        emit();
+      },
+      (error) => {
+        if (onError) onError(error);
+      }
+    );
+
+    return () => {
+      unsubscribeAvailability();
+      unsubscribeBookings();
+    };
   }
 }
 

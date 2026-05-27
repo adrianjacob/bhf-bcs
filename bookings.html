@@ -53,8 +53,14 @@
         <div class="bookings-toolbar">
           <p id="bookings-count" class="bookings-count"></p>
           <div class="bookings-toolbar-actions">
-            <button id="btn-refresh-bookings" type="button" class="btn-cancel-form">Refresh</button>
-            <button id="btn-lock-bookings" type="button" class="btn-submit-form">Lock</button>
+            <div class="bookings-group-toggle" role="group" aria-label="Group bookings by">
+              <button id="btn-group-time" type="button" class="btn-cancel-form is-active" aria-pressed="true">
+                Group by time
+              </button>
+              <button id="btn-group-section" type="button" class="btn-cancel-form" aria-pressed="false">
+                Group by section
+              </button>
+            </div>
           </div>
         </div>
         <div class="bookings-table-wrap">
@@ -73,8 +79,42 @@
             <tbody id="bookings-table-body"></tbody>
           </table>
         </div>
+        <div class="danger-zone">
+          <button id="btn-delete-all-bookings" type="button" class="btn-danger">
+            Delete all bookings
+          </button>
+        </div>
       </section>
     </main>
+
+    <dialog id="delete-all-dialog">
+      <div class="modal-header">
+        <h3>Delete all bookings?</h3>
+        <button class="btn-close-modal" id="btn-close-delete-all-dialog" aria-label="Close">
+          &times;
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="cancel-message">
+          This action cannot be undone. All booking data will be permanently deleted.
+        </p>
+        <div class="form-group">
+          <label for="delete-confirm-input">Type <strong>CONFIRM DELETE</strong> to continue</label>
+          <input
+            type="text"
+            id="delete-confirm-input"
+            placeholder="CONFIRM DELETE"
+            autocomplete="off"
+          />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel-form" id="btn-cancel-delete-all">Cancel</button>
+          <button type="button" class="btn-danger" id="btn-confirm-delete-all" disabled>
+            Permanently delete all
+          </button>
+        </div>
+      </div>
+    </dialog>
 
     <script type="module" src="/src/bookings.js"></script>
   </body>

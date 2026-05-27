@@ -355,6 +355,25 @@ main {
 .bookings-toolbar-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bookings-group-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.bookings-group-toggle .btn-cancel-form {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.bookings-group-toggle .btn-cancel-form.is-active {
+  border-color: var(--bhf-red);
+  color: var(--bhf-red);
+  background-color: #FDF2F5;
 }
 
 .bookings-table-wrap {
@@ -384,6 +403,43 @@ main {
 .bookings-empty {
   color: var(--bhf-text-light);
   font-style: italic;
+}
+
+.bookings-group-row td {
+  background-color: #F8F9FA;
+  color: var(--bhf-dark);
+  font-weight: 700;
+  border-bottom: 1px solid var(--bhf-border);
+}
+
+.danger-zone {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bhf-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  background-color: #B00020;
+  border: none;
+  color: #FFFFFF;
+  padding: 10px 20px;
+  border-radius: var(--pill-radius);
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #8E001A;
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .slot-item {
@@ -764,6 +820,13 @@ dialog::backdrop {
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
+}
+
+.booking-form-error {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--bhf-red);
+  font-weight: 600;
 }
 
 .btn-cancel-form {

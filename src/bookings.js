@@ -1,10 +1,10 @@
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import { getFirestoreDb } from './firebaseClient.js';
 
 const ACCESS_DOC_PATH = ['app_data', 'staff_access'];
 const BOOKINGS_COLLECTION = 'bookings';
-const ACCESS_SESSION_KEY = 'bhf_staff_bookings_unlocked';
 const DAYS = ['Monday 1st', 'Tuesday 2nd', 'Wednesday 3rd'];
+const DELETE_CONFIRM_TEXT = 'CONFIRM DELETE';
 
 const accessCard = document.getElementById('access-card');
 const bookingsCard = document.getElementById('bookings-card');
@@ -13,10 +13,19 @@ const staffPasswordInput = document.getElementById('staff-password');
 const loginError = document.getElementById('login-error');
 const bookingsCount = document.getElementById('bookings-count');
 const bookingsTableBody = document.getElementById('bookings-table-body');
-const btnRefreshBookings = document.getElementById('btn-refresh-bookings');
-const btnLockBookings = document.getElementById('btn-lock-bookings');
+const btnGroupTime = document.getElementById('btn-group-time');
+const btnGroupSection = document.getElementById('btn-group-section');
+const btnDeleteAllBookings = document.getElementById('btn-delete-all-bookings');
+const deleteAllDialog = document.getElementById('delete-all-dialog');
+const btnCloseDeleteAllDialog = document.getElementById('btn-close-delete-all-dialog');
+const btnCancelDeleteAll = document.getElementById('btn-cancel-delete-all');
+const deleteConfirmInput = document.getElementById('delete-confirm-input');
+const btnConfirmDeleteAll = document.getElementById('btn-confirm-delete-all');
 
 let db;
+let unsubscribeBookings = null;
+let bookingsGroupMode = 'time';
+let latestBookings = [];
 
 function timeToMinutes(timeStr) {
   const [hours, minutes] = timeStr.split(':').map(Number);
@@ -61,8 +70,18 @@ async function fetchBookings() {
   snap.forEach((bookingDoc) => {
     rows.push({ id: bookingDoc.id, ...bookingDoc.data() });
   });
+  return rows;
+}
 
-  rows.sort((a, b) => {
+function sortBookings(bookings, mode) {
+  const sorted = [...bookings];
+
+  sorted.sort((a, b) => {
+    if (mode === 'section') {
+      const fieldDiff = (a.field || '').localeCompare(b.field || '');
+      if (fieldDiff !== 0) return fieldDiff;
+    }
+
     const dayDiff = DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
     if (dayDiff !== 0) return dayDiff;
     const timeDiff = timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
@@ -70,13 +89,33 @@ async function fetchBookings() {
     return (a.repName || '').localeCompare(b.repName || '');
   });
 
-  return rows;
+  return sorted;
+}
+
+function getGroupLabel(booking, mode) {
+  if (mode === 'section') {
+    return booking.field || 'Unassigned section';
+  }
+  return `${booking.day} - ${booking.startTime}-${booking.endTime}`;
+}
+
+function renderGroupToggleState() {
+  const isTime = bookingsGroupMode === 'time';
+  btnGroupTime.classList.toggle('is-active', isTime);
+  btnGroupSection.classList.toggle('is-active', !isTime);
+  btnGroupTime.setAttribute('aria-pressed', String(isTime));
+  btnGroupSection.setAttribute('aria-pressed', String(!isTime));
+}
+
+function renderCurrentBookings() {
+  renderBookingsTable(latestBookings);
 }
 
 function renderBookingsTable(bookings) {
-  bookingsCount.textContent = `${bookings.length} booking${bookings.length === 1 ? '' : 's'} found`;
+  const sortedBookings = sortBookings(bookings, bookingsGroupMode);
+  bookingsCount.textContent = `${sortedBookings.length} booking${sortedBookings.length === 1 ? '' : 's'} found`;
 
-  if (bookings.length === 0) {
+  if (sortedBookings.length === 0) {
     bookingsTableBody.innerHTML = `
       <tr>
         <td colspan="7" class="bookings-empty">No bookings yet.</td>
@@ -85,9 +124,21 @@ function renderBookingsTable(bookings) {
     return;
   }
 
-  bookingsTableBody.innerHTML = bookings
-    .map(
-      (booking) => `
+  let currentGroup = null;
+  const rows = [];
+
+  sortedBookings.forEach((booking) => {
+    const groupLabel = getGroupLabel(booking, bookingsGroupMode);
+    if (groupLabel !== currentGroup) {
+      currentGroup = groupLabel;
+      rows.push(`
+        <tr class="bookings-group-row">
+          <td colspan="7">${escapeHtml(groupLabel)}</td>
+        </tr>
+      `);
+    }
+
+    rows.push(`
       <tr>
         <td>${escapeHtml(booking.day)}</td>
         <td>${escapeHtml(booking.startTime)}-${escapeHtml(booking.endTime)}</td>
@@ -97,9 +148,10 @@ function renderBookingsTable(bookings) {
         <td>${escapeHtml(booking.email)}</td>
         <td>${escapeHtml(booking.bookedAt || '—')}</td>
       </tr>
-    `
-    )
-    .join('');
+    `);
+  });
+
+  bookingsTableBody.innerHTML = rows.join('');
 }
 
 function showError(message) {
@@ -107,11 +159,43 @@ function showError(message) {
   loginError.classList.remove('hidden');
 }
 
+function closeDeleteDialog() {
+  deleteAllDialog.close();
+  deleteConfirmInput.value = '';
+  btnConfirmDeleteAll.disabled = true;
+}
+
+function updateDeleteButtonState() {
+  btnConfirmDeleteAll.disabled = deleteConfirmInput.value.trim() !== DELETE_CONFIRM_TEXT;
+}
+
+async function deleteAllBookings() {
+  const snapshot = await getDocs(collection(db, BOOKINGS_COLLECTION));
+  const deletions = snapshot.docs.map((bookingDoc) =>
+    deleteDoc(doc(db, BOOKINGS_COLLECTION, bookingDoc.id))
+  );
+  await Promise.all(deletions);
+}
+
 async function unlockAndLoad() {
   accessCard.classList.add('hidden');
   bookingsCard.classList.remove('hidden');
   const bookings = await fetchBookings();
-  renderBookingsTable(bookings);
+  latestBookings = bookings;
+  renderCurrentBookings();
+
+  if (unsubscribeBookings) {
+    unsubscribeBookings();
+  }
+
+  unsubscribeBookings = onSnapshot(collection(db, BOOKINGS_COLLECTION), (snapshot) => {
+    const rows = [];
+    snapshot.forEach((bookingDoc) => {
+      rows.push({ id: bookingDoc.id, ...bookingDoc.data() });
+    });
+    latestBookings = rows;
+    renderCurrentBookings();
+  });
 }
 
 async function handleLoginSubmit(e) {
@@ -130,7 +214,6 @@ async function handleLoginSubmit(e) {
       showError('Incorrect password.');
       return;
     }
-    sessionStorage.setItem(ACCESS_SESSION_KEY, 'true');
     await unlockAndLoad();
   } catch (error) {
     console.error(error);
@@ -147,21 +230,43 @@ async function initPage() {
   }
 
   staffLoginForm.addEventListener('submit', handleLoginSubmit);
-  btnRefreshBookings.addEventListener('click', async () => {
-    const bookings = await fetchBookings();
-    renderBookingsTable(bookings);
-  });
-  btnLockBookings.addEventListener('click', () => {
-    sessionStorage.removeItem(ACCESS_SESSION_KEY);
-    bookingsCard.classList.add('hidden');
-    accessCard.classList.remove('hidden');
-    staffPasswordInput.value = '';
-    staffPasswordInput.focus();
+
+  btnGroupTime.addEventListener('click', () => {
+    bookingsGroupMode = 'time';
+    renderGroupToggleState();
+    renderCurrentBookings();
   });
 
-  if (sessionStorage.getItem(ACCESS_SESSION_KEY) === 'true') {
-    await unlockAndLoad();
-  }
+  btnGroupSection.addEventListener('click', () => {
+    bookingsGroupMode = 'section';
+    renderGroupToggleState();
+    renderCurrentBookings();
+  });
+
+  btnDeleteAllBookings.addEventListener('click', () => {
+    deleteAllDialog.showModal();
+    deleteConfirmInput.focus();
+  });
+
+  btnCloseDeleteAllDialog.addEventListener('click', closeDeleteDialog);
+  btnCancelDeleteAll.addEventListener('click', closeDeleteDialog);
+  deleteConfirmInput.addEventListener('input', updateDeleteButtonState);
+
+  btnConfirmDeleteAll.addEventListener('click', async () => {
+    if (btnConfirmDeleteAll.disabled) return;
+    btnConfirmDeleteAll.disabled = true;
+    btnConfirmDeleteAll.textContent = 'Deleting...';
+
+    try {
+      await deleteAllBookings();
+      closeDeleteDialog();
+    } finally {
+      btnConfirmDeleteAll.textContent = 'Permanently delete all';
+      updateDeleteButtonState();
+    }
+  });
+
+  renderGroupToggleState();
 }
 
 initPage();

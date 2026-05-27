@@ -5,6 +5,7 @@ let activeField = null;
 let currentBookingTarget = null;
 let cancelTarget = null;
 let repsData = null;
+let unsubscribeRealtime = null;
 
 // DOM Elements
 const fieldListView = document.getElementById('field-list-view');
@@ -34,6 +35,7 @@ const summaryDay = document.getElementById('summary-day');
 const summaryTime = document.getElementById('summary-time');
 const bookingNameInput = document.getElementById('booking-name');
 const bookingEmailInput = document.getElementById('booking-email');
+const bookingFormError = document.getElementById('booking-form-error');
 
 const bookingCountBadge = document.getElementById('booking-count');
 
@@ -145,6 +147,11 @@ function showFieldList() {
   }
 }
 
+function showBookingError(message) {
+  bookingFormError.textContent = message;
+  bookingFormError.classList.remove('hidden');
+}
+
 function showFieldDetail(field) {
   activeField = field;
   fieldSelect.value = activeField;
@@ -174,6 +181,30 @@ function updateBookingStats() {
 async function refreshData() {
   repsData = await dbService.getAvailability();
   updateBookingStats();
+}
+
+async function setupRealtimeSync() {
+  if (unsubscribeRealtime) {
+    unsubscribeRealtime();
+  }
+
+  unsubscribeRealtime = await dbService.subscribeToChanges(
+    (latestData) => {
+      repsData = latestData;
+      updateBookingStats();
+
+      if (!myBookingsView.classList.contains('hidden')) {
+        renderMyBookings();
+      } else if (!fieldDetailView.classList.contains('hidden')) {
+        renderCardView();
+      } else {
+        renderFieldList(repsData.fields);
+      }
+    },
+    (error) => {
+      console.error('Realtime sync failed:', error);
+    }
+  );
 }
 
 function getRepNamesInField() {
@@ -452,6 +483,8 @@ function openBookingModal(repName, day, startTime, endTime) {
 
   bookingNameInput.value = '';
   bookingEmailInput.value = '';
+  bookingFormError.classList.add('hidden');
+  bookingFormError.textContent = '';
 
   bookingDialog.showModal();
 }
@@ -459,6 +492,8 @@ function openBookingModal(repName, day, startTime, endTime) {
 function closeBookingModal() {
   bookingDialog.close();
   currentBookingTarget = null;
+  bookingFormError.classList.add('hidden');
+  bookingFormError.textContent = '';
 }
 
 function setupEventListeners() {
@@ -479,6 +514,8 @@ function setupEventListeners() {
   bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentBookingTarget) return;
+    bookingFormError.classList.add('hidden');
+    bookingFormError.textContent = '';
 
     const details = {
       name: bookingNameInput.value.trim(),
@@ -486,7 +523,7 @@ function setupEventListeners() {
       field: activeField,
     };
 
-    const success = await dbService.bookSlot(
+    const result = await dbService.bookSlot(
       currentBookingTarget.repName,
       currentBookingTarget.day,
       currentBookingTarget.startTime,
@@ -494,12 +531,18 @@ function setupEventListeners() {
       details
     );
 
-    if (success) {
+    if (result.success) {
       closeBookingModal();
       await refreshData();
       renderCardView();
+    } else if (result.reason === 'already-booked') {
+      showBookingError(
+        'Sorry, that slot has just been taken. Please choose another time slot or come to a drop-in session.'
+      );
+    } else {
+      showBookingError('Could not complete the booking right now. Please try again.');
     }
   });
 }
 
-initApp();
+initApp().then(setupRealtimeSync);
